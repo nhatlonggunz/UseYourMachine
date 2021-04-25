@@ -53,9 +53,25 @@ Automaton::Automaton(std::string alphabet,
     }
 }
 
-bool Automaton::IsDFA()
+bool Automaton::IsDFA() const
 {
-    return true;
+    int sumDegree = 0;
+
+    for(auto& iter: transitions_) {
+        State start = iter.first;
+
+        auto setLinks = iter.second;
+
+        // check if exist an edge with symbol "_"
+        auto EmptyLink = std::find_if(setLinks.begin(), setLinks.end(),
+                                      [](const StateLink& s) { return s.first == EMPTY_SYMBOL; });
+        if(EmptyLink != setLinks.end())
+            return false;
+
+        sumDegree += setLinks.size();
+    }
+
+    return sumDegree == (int)listStates_.size() * (int)alphabet_.size();
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)
@@ -93,6 +109,12 @@ std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)
                       "\n";
         }
     }
+
+    output += "\n";
+    output += "\n";
+
+    output += "Is DFA: ";
+    output += (avtomat.IsDFA()? "y" : "n");
 
     os << output;
 

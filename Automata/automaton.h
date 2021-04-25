@@ -46,7 +46,7 @@ public:
               std::vector<State> listFinalStates_,
               Transitions transitions);
 
-    bool IsDFA();
+    bool IsDFA() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 };
