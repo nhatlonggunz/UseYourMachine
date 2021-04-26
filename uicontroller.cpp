@@ -27,30 +27,59 @@ UIController::~UIController()
 
 void UIController::on_actionOpen_triggered()
 {
-    // User choose file
-    QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
-    std::string name = fileName.toStdString();
+    try {
+        // User choose file
+        QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
+        std::string name = fileName.toStdString();
 
-    // Read and write the whole file to input textbox
-    std::ifstream fi(name);
-    std::stringstream buffer;
-    buffer << fi.rdbuf();
-    ui->textboxInputFile->setText(QString::fromStdString(buffer.str()));
+        // Read and write the whole file to input textbox
+        std::ifstream fi(name);
+        std::stringstream buffer;
+        buffer << fi.rdbuf();
+        ui->textboxInputFile->setText(QString::fromStdString(buffer.str()));
 
-    // Parse input
-    fi.seekg(0);
-    Automaton avtomat = Parser::ReadFromStream(fi);
+        // Parse input
+        fi.seekg(0);
+        Automaton avtomat = Parser::ReadFromStream(fi);
 
-    // Write parsed content to file
-    std::ofstream fo("ggout.txt");
-    fo << avtomat;
+        // Write parsed content to file
+        std::ofstream fo("ggout.txt");
+        fo << avtomat;
 
-    // Write
-    std::ostringstream os;
-    os << avtomat;
-    std::string text = os.str();
+        // Write
+        std::ostringstream os;
+        os << avtomat;
+        std::string text = os.str();
 
-    ui->textboxOutputFile->setText(QString::fromStdString(text));
-    fi.close();
-    fo.close();
+        ui->textboxOutputFile->setText(QString::fromStdString(text));
+        fi.close();
+        fo.close();
+    }  catch (const std::invalid_argument& ia) {
+        QMessageBox::warning(this, "Error", ia.what());
+    }
+}
+
+void UIController::on_btnReadInputFile_clicked()
+{
+    try {
+        // Read and write the whole file to input textbox
+        std::string input = ui->textboxInputFile->toPlainText().toStdString();
+
+        // Parse input
+        std::istringstream ss(input);
+        Automaton avtomat = Parser::ReadFromStream(ss);
+
+        // Write parsed content to file
+        std::ofstream fo("ggout.txt");
+        fo << avtomat;
+
+        // Write
+        std::ostringstream os;
+        os << avtomat;
+        std::string text = os.str();
+
+        ui->textboxOutputFile->setText(QString::fromStdString(text));
+    }  catch (const std::invalid_argument& ia) {
+        QMessageBox::warning(this, "Error", ia.what());
+    }
 }

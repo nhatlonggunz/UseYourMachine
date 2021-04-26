@@ -40,7 +40,7 @@ private:
     Transitions transitions_;
 
 public:
-    Automaton();
+    Automaton(); // default construtor
     Automaton(std::string alphabet,
               std::vector<State> listStates,
               std::vector<State> listFinalStates_,

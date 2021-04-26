@@ -3,18 +3,14 @@
 #include <iostream>
 #include <string>
 
-std::size_t StateLinkHasher::operator()(const StateLink &s) const
-{
+std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     using std::hash;
     using std::string;
 
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
 }
 
-Automaton::Automaton()
-{
-
-}
+Automaton::Automaton() {}
 
 Automaton::Automaton(std::string alphabet,
                      std::vector<State> listStates,
@@ -28,7 +24,7 @@ Automaton::Automaton(std::string alphabet,
         auto stateInList = std::find(listStates_.begin(), listStates_.end(), State((it.first).getName()));
 
         if(stateInList == listStates_.end()) {
-            throw std::invalid_argument("Transitions contain non-exist state");
+            throw std::invalid_argument("Transitions contain non-exist initial state");
         }
 
         auto setEnpoints = it.second;
@@ -46,12 +42,16 @@ Automaton::Automaton(std::string alphabet,
                                     State((itEndpoints.second).getName()));
 
             if(stateInList == listStates_.end()) {
-                throw std::invalid_argument("Transitions contain non-exist state");
+                throw std::invalid_argument("Transitions contain non-exist next state");
             }
         }
     }
 }
 
+
+// Every state must have |alphabet| ingoing and outgoing edges.
+// Hence a DFA has |alphabet| * |state|,
+// given that there is no "_" (epsilon)
 bool Automaton::IsDFA() const
 {
     int sumDegree = 0;

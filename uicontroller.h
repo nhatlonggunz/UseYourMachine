@@ -18,6 +18,8 @@ public:
 private slots:
     void on_actionOpen_triggered(); // Open file
 
+    void on_btnReadInputFile_clicked();
+
 private:
     Ui::UIController *ui;
 };
