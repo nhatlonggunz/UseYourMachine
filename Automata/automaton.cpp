@@ -11,7 +11,6 @@ std::size_t StateLinkHasher::operator()(const StateLink &s) const
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
 }
 
-
 Automaton::Automaton()
 {
 

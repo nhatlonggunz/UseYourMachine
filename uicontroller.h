@@ -16,7 +16,7 @@ public:
     ~UIController();
 
 private slots:
-    void on_actionOpen_triggered();
+    void on_actionOpen_triggered(); // Open file
 
 private:
     Ui::UIController *ui;
