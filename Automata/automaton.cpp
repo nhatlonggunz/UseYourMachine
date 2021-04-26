@@ -10,13 +10,7 @@ std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
 }
 
-Automaton::Automaton() {}
-
-Automaton::Automaton(std::string alphabet,
-                     std::vector<State> listStates,
-                     std::vector<State> listFinalStates,
-                     Transitions transitions)
-    : alphabet_(alphabet), listStates_(listStates), listFinalStates_(listFinalStates), transitions_(transitions)
+void Automaton::ValidateTransitionsInput()
 {
     // check if starting state is a valid state
     for(auto& it: transitions_)
@@ -48,6 +42,26 @@ Automaton::Automaton(std::string alphabet,
     }
 }
 
+Automaton::Automaton() {}
+
+Automaton::Automaton(std::string alphabet,
+                     std::vector<State> listStates,
+                     std::vector<State> listFinalStates,
+                     Transitions transitions)
+    : alphabet_(alphabet), listStates_(listStates), transitions_(transitions)
+{
+    ValidateTransitionsInput();
+
+    // Set states in listState as final states.
+    for(auto& finalState: listFinalStates) {
+        auto it = std::find(listStates_.begin(), listStates_.end(), State(finalState));
+
+        if(it == listFinalStates.end())
+            throw std::invalid_argument("An input final state does not exist in list of states");
+        it->setFinal(true);
+    }
+}
+
 
 // Every state must have |alphabet| ingoing and outgoing edges.
 // Hence a DFA has |alphabet| * |state|,
@@ -56,7 +70,7 @@ bool Automaton::IsDFA() const
 {
     int sumDegree = 0;
 
-    for(auto& iter: transitions_) {
+    for(auto&& iter: transitions_) {
         State start = iter.first;
 
         auto setLinks = iter.second;
@@ -73,6 +87,11 @@ bool Automaton::IsDFA() const
     return sumDegree == (int)listStates_.size() * (int)alphabet_.size();
 }
 
+bool Automaton::IsWordBelongTo(std::string word)
+{
+
+}
+
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)
 {
     std::string output = "";
@@ -87,14 +106,15 @@ std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)
     output += "\n";
 
 
-    for(auto&& state: avtomat.listFinalStates_) {
-        output += state.getName() + ",";
+    for(auto&& state: avtomat.listStates_) {
+        if(state.IsFinal())
+            output += state.getName() + ",";
     }
     output.erase(output.size() - 1, 1); // remove last ","
     output += "\n";
     output += "\n";
 
-    for(auto& s_iter: avtomat.transitions_)
+    for(auto&& s_iter: avtomat.transitions_)
     {
         State start = s_iter.first;
         auto setLinks = s_iter.second;

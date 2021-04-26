@@ -5,13 +5,23 @@ State::State()
     this->name = "";
 }
 
-State::State(std::string name): name(name)
+State::State(std::string name): name(name), isFinal_(false)
 {
 }
 
 std::string State::getName() const
 {
     return this->name;
+}
+
+bool State::IsFinal() const
+{
+    return this->isFinal_;
+}
+
+void State::setFinal(bool isFinal)
+{
+    this->isFinal_ = isFinal;
 }
 
 bool State::operator==(const State &other) const

@@ -8,12 +8,16 @@ class State
 {
 private:
     std::string name;
+    bool isFinal_;
 
 public:
     State();
     State(std::string name);
 
     std::string getName() const;
+
+    bool IsFinal() const;
+    void setFinal(bool isFinal);
 
     bool operator== (const State& other) const;
     bool operator< (const State& other) const;

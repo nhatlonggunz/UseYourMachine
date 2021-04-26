@@ -33,11 +33,20 @@ class Automaton
 {
 private:
     std::string alphabet_;
-    std::vector<State> listStates_;
-    std::vector<State> listFinalStates_;
 
+    // Some processes takes O(n^2)
+    // Use Hash Table if number of states ~= 10^5
+    // All implementations are generic,
+    // hence changing to Hash Table does not require modification of implementation
+    std::vector<State> listStates_;
+
+    // Representation:
     // transition_[startState] = {(symbol, nextState),...}
     Transitions transitions_;
+
+    // DFS to check if word belong to automaton
+    bool IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex);
+    void ValidateTransitionsInput();
 
 public:
     Automaton(); // default construtor
@@ -46,7 +55,9 @@ public:
               std::vector<State> listFinalStates_,
               Transitions transitions);
 
+
     bool IsDFA() const;
+    bool IsWordBelongTo(std::string word); // check if a word belongs to the Automaton
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 };
