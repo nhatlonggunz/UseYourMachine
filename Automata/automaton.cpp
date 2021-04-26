@@ -2,12 +2,39 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <set>
 
 std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     using std::hash;
     using std::string;
 
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
+}
+
+bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex,
+                                    std::set<std::pair<State,int>> visited)
+{
+    // end of word, end up at a final state.
+    if(wordIndex == (int)word.length() && curState.IsFinal())
+        return true;
+
+    for(auto&& edge: this->transitions_[curState]) {
+        char transSymbol = edge.first;
+        State nextState = edge.second;
+
+        std::pair<State,int> nextDfsState(nextState, wordIndex + (transSymbol != EMPTY_SYMBOL));
+
+        if((transSymbol == EMPTY_SYMBOL || transSymbol == word[wordIndex]) &&
+                !visited.count(nextDfsState))
+        {
+            visited.insert(nextDfsState);
+            if(IsWordBelongTo_Util(nextDfsState.first, word,
+                                   nextDfsState.second, visited))
+                return true;
+        }
+    }
+
+    return false;
 }
 
 void Automaton::ValidateTransitionsInput()
@@ -52,6 +79,8 @@ Automaton::Automaton(std::string alphabet,
 {
     ValidateTransitionsInput();
 
+    startState_ = listStates_[0];
+
     // Set states in listState as final states.
     for(auto& finalState: listFinalStates) {
         auto it = std::find(listStates_.begin(), listStates_.end(), State(finalState));
@@ -89,7 +118,7 @@ bool Automaton::IsDFA() const
 
 bool Automaton::IsWordBelongTo(std::string word)
 {
-
+    return IsWordBelongTo_Util(startState_, word, 0, std::set<std::pair<State, int>>());
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)

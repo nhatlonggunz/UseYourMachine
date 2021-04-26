@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
+#include <set>
 
 #include "state.h"
 
@@ -44,10 +45,13 @@ private:
     // transition_[startState] = {(symbol, nextState),...}
     Transitions transitions_;
 
+    State startState_;
+
     // DFS to check if word belong to automaton
-    bool IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex);
     void ValidateTransitionsInput();
 
+    bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
+                             std::set<std::pair<State, int> > visited);
 public:
     Automaton(); // default construtor
     Automaton(std::string alphabet,
