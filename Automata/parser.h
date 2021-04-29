@@ -1,4 +1,4 @@
-﻿#ifndef PARSER_H
+#ifndef PARSER_H
 #define PARSER_H
 
 #include "Automata/automaton.h"
@@ -8,14 +8,30 @@
 
 class Parser
 {
+private:
+    // parsed Automaton
+    Automaton avtomat_;
+
+    // Test vector
+    std::vector<std::pair<std::string, bool>> testWords_;
+    bool testIsFinite_;
+    bool testIsDFA_;
+
+
+    /* Parsing utilities */
+    std::vector<State> ReadStates(std::string input);
+    void ReadTransitions(std::istream& is, Transitions& transitions);
+    void ReadTestWords(std::istream& is);
+
 public:
     Parser();
 
-    static Automaton ReadFromStream(std::istream& in);
+    void ReadFromStream(std::istream& in);
 
-    /* Parsing utilities */
-    static std::vector<State> ReadStates(std::string input);
-    static void ReadTransitions(std::istream& is, Transitions& transitions);
+    Automaton getAutomaton();
+    std::vector<std::pair<std::string, bool> > getTestWords() const;
+    bool getTestIsFinite() const;
+    bool getTestIsDFA() const;
 
     /* string utilities */
     static inline void ltrim(std::string &s);

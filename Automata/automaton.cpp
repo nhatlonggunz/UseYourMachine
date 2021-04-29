@@ -82,12 +82,23 @@ Automaton::Automaton(std::string alphabet,
     startState_ = listStates_[0];
 
     // Set states in listState as final states.
-    for(auto& finalState: listFinalStates) {
+    for(auto&& finalState: listFinalStates) {
         auto it = std::find(listStates_.begin(), listStates_.end(), State(finalState));
 
         if(it == listFinalStates.end())
             throw std::invalid_argument("An input final state does not exist in list of states");
         it->setFinal(true);
+    }
+
+    // update final states in transition function
+    for(auto&& iter_f: this->transitions_){
+        auto trueState = *std::find(listStates_.begin(), listStates_.end(), State(iter_f.first.getName()));
+        iter_f.first.setFinal(trueState.IsFinal());
+
+        for(auto&& iter_s: iter_f.second) {
+            auto tmpTrueState = *std::find(listStates_.begin(), listStates_.end(), State(iter_s.second.getName()));
+            iter_s.second.setFinal(tmpTrueState.IsFinal());
+        }
     }
 }
 
@@ -119,6 +130,33 @@ bool Automaton::IsDFA() const
 bool Automaton::IsWordBelongTo(std::string word)
 {
     return IsWordBelongTo_Util(startState_, word, 0, std::set<std::pair<State, int>>());
+}
+
+void Automaton::ValidateTestVector(bool testIsDFA, bool testIsFinite, std::vector<std::pair<std::string, bool> > testWords)
+{
+    bool thisIsDFA = IsDFA();
+
+    if(thisIsDFA  != testIsDFA) {
+        std::string error = std::string("This automaton is") +
+                            (thisIsDFA ? "" : " not") +
+                            " DFA. While test vector is" +
+                            (testIsDFA ? "" : " not") +
+                            " DFA.";
+
+        throw std::invalid_argument(error);
+    }
+    for(auto&& testWord: testWords) {
+        bool belongsToAutomaton = this->IsWordBelongTo(testWord.first);
+
+        if(belongsToAutomaton != testWord.second) {
+            std::string error = testWord.first +
+                                (belongsToAutomaton ? " belongs to" : " does not belong to") +
+                                "  DFA. While test vector says it" +
+                                (testWord.second ? " belongs to" : " does not belong to") +
+                                " DFA.";
+            throw std::invalid_argument(error);
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)

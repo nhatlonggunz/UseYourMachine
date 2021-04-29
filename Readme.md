@@ -10,8 +10,10 @@ Functionalities:
 - Creating Automaton and States.
     -   ```Hash```, ```operator==```, ```operator<```
 - Check if input is DFA (finish assignment 1)
+- Parse test vector. 
+- Check if a word belongs to the automaton (finish assignment 2)
 
 Todo: 
-- Parse test vector.
-- Check if a word belongs to the automaton (finish assignment 2)
+- Handle the case where test vector is not present 
 - Unit Test for assignment 1,2
+- Parsing regular expression

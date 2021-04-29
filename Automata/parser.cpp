@@ -10,7 +10,7 @@ Parser::Parser()
 
 }
 
-Automaton Parser::ReadFromStream(std::istream &in)
+void Parser::ReadFromStream(std::istream &in)
 {
     std::string alphabet;
     std::vector<State> listStates;
@@ -23,6 +23,7 @@ Automaton Parser::ReadFromStream(std::istream &in)
     {
         // preprocess string
         line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
         trim(line);
 
         if(line.size() == 0 || line[0] == '#')
@@ -54,11 +55,20 @@ Automaton Parser::ReadFromStream(std::istream &in)
         if(std::regex_search(line, std::regex("^transitions:"))) {
             ReadTransitions(in, transitions);
         }
+        if(line.size() == 5 && line.substr(0, 3) == "dfa") {
+            char tmp = line[4]; // format is "dfa:y"
+            this->testIsDFA_ = (tmp == 'y');
+        }
+        if(line.size() == 8 && line.substr(0, 6) == "finite") {
+            char tmp = line[7]; // finite:n
+            this->testIsFinite_ = (tmp == 'y');
+        }
+        if(line.size() == 6 && line == "words:") {
+            ReadTestWords(in);
+        }
     }
 
-    Automaton result = Automaton(alphabet, listStates, listFinalStates, transitions);
-
-    return result;
+    avtomat_ = Automaton(alphabet, listStates, listFinalStates, transitions);
 }
 
 // trim from start (in place)
@@ -79,6 +89,26 @@ inline void Parser::rtrim(std::string &s) {
 inline void Parser::trim(std::string &s) {
     ltrim(s);
     rtrim(s);
+}
+
+Automaton Parser::getAutomaton()
+{
+    return avtomat_;
+}
+
+std::vector<std::pair<std::string, bool> > Parser::getTestWords() const
+{
+    return testWords_;
+}
+
+bool Parser::getTestIsFinite() const
+{
+    return testIsFinite_;
+}
+
+bool Parser::getTestIsDFA() const
+{
+    return testIsDFA_;
 }
 
 std::vector<State> Parser::ReadStates(std::string input)
@@ -104,6 +134,7 @@ void Parser::ReadTransitions(std::istream& is, Transitions& transitions)
     {
         // preprocess string
         line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
         trim(line);
 
         if(line.size() == 0 || line[0] == '#')
@@ -125,5 +156,31 @@ void Parser::ReadTransitions(std::istream& is, Transitions& transitions)
         State dest = State(str);
 
         transitions[start].insert(StateLink(symbol, dest));
+    }
+}
+
+void Parser::ReadTestWords(std::istream &is)
+{
+    std::string line;
+
+    while(std::getline(is, line)) {
+        // preprocess string
+        line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+        trim(line);
+
+        if(line.size() == 0 || line[0] == '#')
+            continue;
+        if(line == "end.")
+            break;
+
+        std::string tmpWord = line.substr(0, line.find(","));
+        char tmpIsValid = line.back();
+
+        if(tmpWord.size() + 2 != line.size()) {
+            throw std::invalid_argument("A word is valid");
+        }
+
+        this->testWords_.push_back(std::make_pair(tmpWord, tmpIsValid == 'y'));
     }
 }

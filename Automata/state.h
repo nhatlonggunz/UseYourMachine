@@ -8,7 +8,7 @@ class State
 {
 private:
     std::string name;
-    bool isFinal_;
+    mutable bool isFinal_;
 
 public:
     State();
@@ -17,7 +17,7 @@ public:
     std::string getName() const;
 
     bool IsFinal() const;
-    void setFinal(bool isFinal);
+    void setFinal(bool isFinal) const;
 
     bool operator== (const State& other) const;
     bool operator< (const State& other) const;

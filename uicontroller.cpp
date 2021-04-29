@@ -27,6 +27,8 @@ UIController::~UIController()
 
 void UIController::on_actionOpen_triggered()
 {
+    Parser parser = Parser();
+
     try {
         // User choose file
         QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
@@ -40,7 +42,15 @@ void UIController::on_actionOpen_triggered()
 
         // Parse input
         fi.seekg(0);
-        Automaton avtomat = Parser::ReadFromStream(fi);
+        parser.ReadFromStream(fi);
+        Automaton avtomat = parser.getAutomaton();
+
+        // Validate test vector
+        auto isDFA = parser.getTestIsDFA();
+        auto isFinite = parser.getTestIsFinite();
+        auto testWords = parser.getTestWords();
+
+        avtomat.ValidateTestVector(isDFA, isFinite, testWords);
 
         // Write parsed content to file
         std::ofstream fo("ggout.txt");
@@ -61,13 +71,17 @@ void UIController::on_actionOpen_triggered()
 
 void UIController::on_btnReadInputFile_clicked()
 {
+    Parser parser = Parser();
+
     try {
         // Read and write the whole file to input textbox
         std::string input = ui->textboxInputFile->toPlainText().toStdString();
 
         // Parse input
         std::istringstream ss(input);
-        Automaton avtomat = Parser::ReadFromStream(ss);
+
+        parser.ReadFromStream(ss);
+        Automaton avtomat = parser.getAutomaton();
 
         // Write parsed content to file
         std::ofstream fo("ggout.txt");

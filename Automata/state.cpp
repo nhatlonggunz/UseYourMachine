@@ -19,7 +19,7 @@ bool State::IsFinal() const
     return this->isFinal_;
 }
 
-void State::setFinal(bool isFinal)
+void State::setFinal(bool isFinal) const
 {
     this->isFinal_ = isFinal;
 }

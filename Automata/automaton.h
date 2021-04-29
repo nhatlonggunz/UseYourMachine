@@ -19,13 +19,13 @@
 // Short, different strings are used as state name and alphabet (A1, A2, a, b, c, ...)
 // so collisions cannot happen. Hence O(n) worst-case complexity never occurs.
 
-typedef std::pair<char, State> StateLink;
+typedef std::pair<char, State> StateLink; // An edge in the Automaton
 
 struct StateLinkHasher {
     std::size_t operator()(const StateLink& s) const;
 };
 
-
+// Transition function. transition_[startState] = {(symbol, nextState), ...}
 typedef std::unordered_map<State, std::unordered_set<StateLink, StateLinkHasher>, StateHasher> Transitions;
 
 const char EMPTY_SYMBOL = '_';
@@ -49,6 +49,7 @@ private:
 
     // DFS to check if word belong to automaton
     void ValidateTransitionsInput();
+    void ReReferenceTransitions();
 
     bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
                              std::set<std::pair<State, int> > visited);
@@ -62,6 +63,9 @@ public:
 
     bool IsDFA() const;
     bool IsWordBelongTo(std::string word); // check if a word belongs to the Automaton
+    void ValidateTestVector(bool testIsDFA,
+                            bool testIsFinite,
+                            std::vector<std::pair<std::string, bool> > testWords);
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 };
