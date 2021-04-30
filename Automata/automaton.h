@@ -49,7 +49,6 @@ private:
 
     // DFS to check if word belong to automaton
     void ValidateTransitionsInput();
-    void ReReferenceTransitions();
 
     bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
                              std::set<std::pair<State, int> > visited);
@@ -66,6 +65,7 @@ public:
     void ValidateTestVector(bool testIsDFA,
                             bool testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
+    std::string ToGraph();
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 };

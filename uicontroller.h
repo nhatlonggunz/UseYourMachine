@@ -2,6 +2,7 @@
 #define UICONTROLLER_H
 
 #include <QMainWindow>
+#include "Automata/automaton.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class UIController; }
@@ -20,7 +21,12 @@ private slots:
 
     void on_btnReadInputFile_clicked();
 
+    void on_btnGenerateGraph_clicked();
+
 private:
     Ui::UIController *ui;
+    Automaton avtomat_;
+
+    void LoadGraph();
 };
 #endif // UICONTROLLER_H

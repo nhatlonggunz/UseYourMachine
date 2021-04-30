@@ -4,37 +4,12 @@
 #include <string>
 #include <set>
 
+// StateLinkHasher for HashMap
 std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     using std::hash;
     using std::string;
 
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
-}
-
-bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex,
-                                    std::set<std::pair<State,int>> visited)
-{
-    // end of word, end up at a final state.
-    if(wordIndex == (int)word.length() && curState.IsFinal())
-        return true;
-
-    for(auto&& edge: this->transitions_[curState]) {
-        char transSymbol = edge.first;
-        State nextState = edge.second;
-
-        std::pair<State,int> nextDfsState(nextState, wordIndex + (transSymbol != EMPTY_SYMBOL));
-
-        if((transSymbol == EMPTY_SYMBOL || transSymbol == word[wordIndex]) &&
-                !visited.count(nextDfsState))
-        {
-            visited.insert(nextDfsState);
-            if(IsWordBelongTo_Util(nextDfsState.first, word,
-                                   nextDfsState.second, visited))
-                return true;
-        }
-    }
-
-    return false;
 }
 
 void Automaton::ValidateTransitionsInput()
@@ -67,6 +42,32 @@ void Automaton::ValidateTransitionsInput()
             }
         }
     }
+}
+
+bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex,
+                                    std::set<std::pair<State,int>> visited)
+{
+    // end of word, end up at a final state.
+    if(wordIndex == (int)word.length() && curState.IsFinal())
+        return true;
+
+    for(auto&& edge: this->transitions_[curState]) {
+        char transSymbol = edge.first;
+        State nextState = edge.second;
+
+        std::pair<State,int> nextDfsState(nextState, wordIndex + (transSymbol != EMPTY_SYMBOL));
+
+        if((transSymbol == EMPTY_SYMBOL || transSymbol == word[wordIndex]) &&
+                !visited.count(nextDfsState))
+        {
+            visited.insert(nextDfsState);
+            if(IsWordBelongTo_Util(nextDfsState.first, word,
+                                   nextDfsState.second, visited))
+                return true;
+        }
+    }
+
+    return false;
 }
 
 Automaton::Automaton() {}
@@ -157,6 +158,43 @@ void Automaton::ValidateTestVector(bool testIsDFA, bool testIsFinite, std::vecto
             throw std::invalid_argument(error);
         }
     }
+}
+
+std::string Automaton::ToGraph()
+{
+    // start string
+    std::string content = "digraph Automaton {\n"
+                          "rankdir=LR;\n"
+                          "\"\" [shape=none]\n";
+
+    // end state
+    content += "node [shape = doublecircle]; ";
+    for(auto&& s : listStates_) {
+        if(s.IsFinal())
+            content += s.getName() + " ";
+    }
+    content += ";\n";
+
+
+    // Draw remaining nodes. Draw edges
+    content += "node [shape = circle];\n";
+    content += std::string("\"\" -> ") + "\"" + listStates_[0].getName() + "\"\n";
+
+    for(auto&& iter_f: transitions_) {
+        for(auto&& iter_s: iter_f.second) {
+            std::string formattedSymbol = std::string(1, iter_s.first);
+            if(formattedSymbol == "_")
+                formattedSymbol = "\u03B5";
+            content += iter_f.first.getName();
+            content += " -> ";
+            content += iter_s.second.getName();
+            content += std::string("[label = \"") + formattedSymbol + "\"];\n";
+        }
+    }
+
+    content += "}";
+
+    return content;
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)

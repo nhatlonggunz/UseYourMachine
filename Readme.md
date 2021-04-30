@@ -12,8 +12,9 @@ Functionalities:
 - Check if input is DFA (finish assignment 1)
 - Parse test vector. 
 - Check if a word belongs to the automaton (finish assignment 2)
+- Display automaton graph.
 
 Todo: 
-- Handle the case where test vector is not present 
-- Unit Test for assignment 1,2
+- Handle the case where some test vector fields is not present 
 - Parsing regular expression
+- Unit Test
