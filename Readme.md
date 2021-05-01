@@ -14,7 +14,18 @@ Functionalities:
 - Check if a word belongs to the automaton (finish assignment 2)
 - Display automaton graph.
 
+RegexParser: 
+- Tokenizer Finished
+- Wait for AST and nodes
+
+AST and nodes:
+- Redesign clearly the node pointers/destructors/rules of 3/5/0, etc
+- (current reading: just use raw pointers rather than smart pointers)
+- Problems now: How to implement IOperator::operate(vector<BaseNode>) ?
+
 Todo: 
+- Implement AST and Nodes
+- Implement RegexParser
 - Handle the case where some test vector fields is not present 
 - Parsing regular expression
 - Unit Test

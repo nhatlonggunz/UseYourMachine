@@ -165,3 +165,8 @@ void UIController::LoadGraph()
         ui->lblGraph->setPixmap(pix);
     }
 }
+
+void UIController::on_btnReadRegex_clicked()
+{
+    std::string regex = ui->txtboxInputRegex->text().toStdString();
+}

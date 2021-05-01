@@ -23,6 +23,8 @@ private slots:
 
     void on_btnGenerateGraph_clicked();
 
+    void on_btnReadRegex_clicked();
+
 private:
     Ui::UIController *ui;
     Automaton avtomat_;
