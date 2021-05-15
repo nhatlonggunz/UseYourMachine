@@ -10,14 +10,9 @@
 
 class RegexParser
 {
-private:
-
-    void ToAST(std::vector<std::string> listTokens);
-    std::vector<std::string> Tokenize(std::string prefix);
 public:
     RegexParser();
-
-    void Parse(std::string regex);
+    std::vector<std::string> Tokenize(std::string prefix);
 };
 
 #endif // REGEXPARSER_H

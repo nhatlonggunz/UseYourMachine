@@ -20,11 +20,20 @@ RegexParser:
 
 AST and nodes:
 - Redesign clearly the node pointers/destructors/rules of 3/5/0, etc
-- (current reading: just use raw pointers rather than smart pointers)
-- Problems now: How to implement IOperator::operate(vector<BaseNode>) ?
+
+- Problem: How to implement IOperator::operate(vector<BaseNode>)
+	(current reading: just use raw pointers rather than smart pointers)
+	(done: use pointers)
+
+- Problem: Should regex parser generate AST? 
+	(done: regex parser only tokenizes. AST build the tree from tokens. 
+		otherwise, regexparser knows AST completely, violating encapsulation.
+	
 
 Todo: 
 - Implement AST and Nodes
+	(done concrete nodes, node factory. Move tree building to AST. Remove ioperator, move to ast)
+	(need: implement build tree in AST construtor. Get list token first and build from tokens)
 - Implement RegexParser
 - Handle the case where some test vector fields is not present 
 - Parsing regular expression

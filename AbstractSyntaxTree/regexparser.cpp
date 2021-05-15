@@ -8,11 +8,6 @@ RegexParser::RegexParser()
 
 }
 
-void RegexParser::ToAST(std::vector<std::string> listTokens)
-{
-    std::stack<std::string>
-}
-
 std::vector<std::string> RegexParser::Tokenize(std::string prefix)
 {
     std::vector<std::string> listTokens;

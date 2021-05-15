@@ -9,9 +9,13 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/concatenation.cpp \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/empty.cpp \
     AbstractSyntaxTree/TreeNode/ConcreteNode/kleenestar.cpp \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/literal.cpp \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/union.cpp \
     AbstractSyntaxTree/TreeNode/basenode.cpp \
-    AbstractSyntaxTree/TreeNode/ioperator.cpp \
+    AbstractSyntaxTree/TreeNode/basenodefactory.cpp \
     AbstractSyntaxTree/abstractsyntaxtree.cpp \
     AbstractSyntaxTree/regexparser.cpp \
     Automata/automaton.cpp \
@@ -21,12 +25,15 @@ SOURCES += \
     uicontroller.cpp
 
 HEADERS += \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/concatenation.h \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/empty.h \
     AbstractSyntaxTree/TreeNode/ConcreteNode/kleenestar.h \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/literal.h \
+    AbstractSyntaxTree/TreeNode/ConcreteNode/union.h \
     AbstractSyntaxTree/TreeNode/basenode.h \
-    AbstractSyntaxTree/TreeNode/ioperator.h \
+    AbstractSyntaxTree/TreeNode/basenodefactory.h \
     AbstractSyntaxTree/abstractsyntaxtree.h \
     AbstractSyntaxTree/regexparser.h \
-    AbstractSyntaxTree/treenode.h \
     Automata/automaton.h \
     Automata/parser.h \
     Automata/state.h \
