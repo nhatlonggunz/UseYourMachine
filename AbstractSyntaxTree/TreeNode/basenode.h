@@ -12,20 +12,23 @@ public:
     BaseNode(BaseNode* left, BaseNode *right);
 
     virtual void ToNFA(Automaton& avtomat);
-    void Operate(const std::vector<BaseNode*>& operands);
+    virtual void Operate(const std::vector<BaseNode*>& operands);
 
     BaseNode *left() const;
     BaseNode *right() const;
 
     bool IsOperator() const;
 
+    virtual std::string toString();
+
 private:
     char name_;
-    BaseNode* left_;
-    BaseNode* right_;
 
 protected:
     bool isOperator_;
+    char nodeContentName_;
+    BaseNode* left_;
+    BaseNode* right_;
 };
 
 #endif // BASENODE_H

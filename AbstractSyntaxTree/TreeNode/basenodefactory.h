@@ -10,7 +10,7 @@
 class BaseNodeFactory
 {
 public:
-    static BaseNode GetNode(char c);
+    static BaseNode* GetNode(char c);
 };
 
 #endif // BASENODEFACTORY_H

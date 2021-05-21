@@ -8,6 +8,7 @@
 
 #include "Automata/automaton.h"
 #include "Automata/parser.h"
+#include "AbstractSyntaxTree/abstractsyntaxtree.h"
 
 #include <iostream>
 #include <fstream>
@@ -169,4 +170,7 @@ void UIController::LoadGraph()
 void UIController::on_btnReadRegex_clicked()
 {
     std::string regex = ui->txtboxInputRegex->text().toStdString();
+
+    AbstractSyntaxTree ast(regex);
+    QMessageBox::information(this, "debug", QString::fromStdString(ast.toString()));
 }

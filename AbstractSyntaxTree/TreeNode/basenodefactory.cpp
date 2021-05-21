@@ -1,18 +1,18 @@
 #include "basenodefactory.h"
 
 
-BaseNode BaseNodeFactory::GetNode(char c)
+BaseNode* BaseNodeFactory::GetNode(char c)
 {
     switch (c) {
     case '_':
-        return Empty();
+        return new Empty();
     case '.':
-        return Concatenation();
+        return new Concatenation();
     case '|':
-        return Union();
+        return new Union();
     case '*':
-        return KleeneStar();
+        return new KleeneStar();
     default:
-        return Literal(c);
+        return new Literal(c);
     }
 }

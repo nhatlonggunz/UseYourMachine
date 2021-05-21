@@ -18,7 +18,7 @@ std::vector<std::string> RegexParser::Tokenize(std::string prefix)
         std::string token = "";
 
         // Read whole string until encountering a delimiter
-        while(delimiter.find(prefix[i]) != std::string::npos &&
+        while(delimiter.find(prefix[i]) == std::string::npos &&
               i < prefix.size())
             token += prefix[i++];
 

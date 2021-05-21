@@ -9,6 +9,8 @@ public:
     KleeneStar();
 
     void ToNFA(Automaton& avtomat) override;
+    void Operate(const std::vector<BaseNode *> &operands) override;
+    std::string toString() override;
 };
 
 #endif // KLEENESTAR_H

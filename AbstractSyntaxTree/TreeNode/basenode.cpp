@@ -17,6 +17,11 @@ BaseNode::BaseNode(BaseNode *left, BaseNode *right)
 
 }
 
+void BaseNode::ToNFA(Automaton &avtomat)
+{
+
+}
+
 void BaseNode::Operate(const std::vector<BaseNode *> &operands)
 {
     if(operands.size() != 2)
@@ -38,4 +43,22 @@ BaseNode *BaseNode::right() const
 bool BaseNode::IsOperator() const
 {
     return isOperator_;
+}
+
+std::string BaseNode::toString()
+{
+    std::string content = "";
+
+    if(this->IsOperator()) {
+        content = "(" +
+                  this->left_->toString() +
+                  this->nodeContentName_ +
+                  this->right_->toString() +
+                  ")";
+    }
+    else {
+        content = this->nodeContentName_;
+    }
+
+    return content;
 }
