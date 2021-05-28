@@ -25,7 +25,7 @@ private:
     char name_;
 
 protected:
-    bool isOperator_;
+    bool isOperator_ = false;
     char nodeContentName_;
     BaseNode* left_;
     BaseNode* right_;

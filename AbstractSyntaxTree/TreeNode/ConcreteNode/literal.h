@@ -8,7 +8,7 @@ class Literal: public BaseNode
 public:
     Literal();
     Literal(char name);
-    void ToNFA(Automaton& avtomat) override;
+    void ToNFA(Automaton& avtomat);
 };
 
 #endif // LITERAL_H

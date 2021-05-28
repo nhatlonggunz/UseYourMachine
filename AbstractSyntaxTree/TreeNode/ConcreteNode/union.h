@@ -7,7 +7,7 @@ class Union: public BaseNode
 {
 public:
     Union();
-    void ToNFA(Automaton& avtomat) override;
+    void ToNFA(Automaton& avtomat);
 };
 
 #endif // UNION_H

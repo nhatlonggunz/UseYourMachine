@@ -15,8 +15,7 @@ Functionalities:
 - Display automaton graph.
 
 RegexParser: 
-- Tokenizer Finished
-- Wait for AST and nodes
+- Done
 
 AST and nodes:
 - Redesign clearly the node pointers/destructors/rules of 3/5/0, etc
@@ -28,13 +27,13 @@ AST and nodes:
 - Problem: Should regex parser generate AST? 
 	(done: regex parser only tokenizes. AST build the tree from tokens. 
 		otherwise, regexparser knows AST completely, violating encapsulation.
-	
+
+- Build tree done
+- To string done
+
 
 Todo: 
-- Implement AST and Nodes
-	(done concrete nodes, node factory. Move tree building to AST. Remove ioperator, move to ast)
-	(need: implement build tree in AST construtor. Get list token first and build from tokens)
-- Implement RegexParser
+- Test build tree thoroughly
+- Convert to DFA
 - Handle the case where some test vector fields is not present 
-- Parsing regular expression
 - Unit Test

@@ -10,7 +10,7 @@ public:
 
     void ToNFA(Automaton& avtomat) override;
     void Operate(const std::vector<BaseNode *> &operands) override;
-    std::string toString() override;
+    std::string toString();
 };
 
 #endif // KLEENESTAR_H

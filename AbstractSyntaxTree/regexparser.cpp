@@ -22,7 +22,8 @@ std::vector<std::string> RegexParser::Tokenize(std::string prefix)
               i < prefix.size())
             token += prefix[i++];
 
-        listTokens.push_back(token);
+        if(token != "")
+            listTokens.push_back(token);
     }
     return listTokens;
 }

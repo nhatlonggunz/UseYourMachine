@@ -50,10 +50,13 @@ std::string BaseNode::toString()
     std::string content = "";
 
     if(this->IsOperator()) {
+        std::string Left = this->left_->toString();
+        std::string Right = this->right_->toString();
+
         content = "(" +
-                  this->left_->toString() +
+                  Left +
                   this->nodeContentName_ +
-                  this->right_->toString() +
+                  Right +
                   ")";
     }
     else {

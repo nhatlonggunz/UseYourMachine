@@ -38,7 +38,10 @@ BaseNode *AbstractSyntaxTree::BuildFromTokensUtil(std::vector<std::string> &list
         return currentNode;
 
     BaseNode* leftOperand = BuildFromTokensUtil(listTokens);
-    BaseNode* rightOperand = BuildFromTokensUtil(listTokens);
+    BaseNode* rightOperand = nullptr;
+
+    if(currentOperator != '*')
+        rightOperand = BuildFromTokensUtil(listTokens);
 
     currentNode->Operate(std::vector<BaseNode*>{leftOperand, rightOperand});
 
