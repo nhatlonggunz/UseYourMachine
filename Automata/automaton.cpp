@@ -12,6 +12,51 @@ std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     return hash<char>()(s.first) ^ (hash<string>()(s.second.getName()) << 1);
 }
 
+std::string Automaton::alphabet() const
+{
+    return alphabet_;
+}
+
+std::vector<State> Automaton::listStates() const
+{
+    return listStates_;
+}
+
+Transitions Automaton::transitions() const
+{
+    return transitions_;
+}
+
+State Automaton::startState() const
+{
+    return startState_;
+}
+
+void Automaton::setStartState(const State &startState)
+{
+    startState_ = startState;
+}
+
+std::vector<State> Automaton::listEndStates() const
+{
+    return listEndStates_;
+}
+
+void Automaton::setListEndStates(const std::vector<State> &listEndStates)
+{
+    listEndStates_ = listEndStates;
+}
+
+State Automaton::oneEndState() const
+{
+    return oneEndState_;
+}
+
+void Automaton::setOneEndState(const State &oneEndState)
+{
+    oneEndState_ = oneEndState;
+}
+
 void Automaton::ValidateTransitionsInput()
 {
     // check if starting state is a valid state
@@ -30,7 +75,7 @@ void Automaton::ValidateTransitionsInput()
             // check if transition symbol is a valid symbol
             if(this->alphabet_.find(std::string(1, itEndpoints.first)) == std::string::npos &&
                itEndpoints.first != EMPTY_SYMBOL)
-                throw std::invalid_argument("Transitions contain invalid symbol");
+                throw std::invalid_argument("Transitions contain invalid symbol" + std::string(1, itEndpoints.first));
 
             // check if next state is a valid state
             stateInList = std::find(listStates_.begin(),
@@ -71,6 +116,12 @@ bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int
 }
 
 Automaton::Automaton() {}
+
+Automaton::Automaton(std::string alphabet)
+    : alphabet_(alphabet)
+{
+
+}
 
 Automaton::Automaton(std::string alphabet,
                      std::vector<State> listStates,
@@ -195,6 +246,93 @@ std::string Automaton::ToGraph()
     content += "}";
 
     return content;
+}
+
+std::string Automaton::ToFileContent(std::string comment)
+{
+    std::string content;
+
+    if(comment != "") {
+        content += "#" + comment + "\n\n";
+    }
+
+    content += "alphabet: " + this->alphabet_ + "\n";
+
+    /* add list states. First state is alway the start state.*/
+    content += "states: ";
+
+    content += startState_.getName();
+
+    for(auto&& state: listStates_)
+        if(state.getName() != startState_.getName())
+            content += state.getName() + ",";
+
+    content.pop_back();
+    content += "\n";
+
+    /* final states */
+    content += "final: " + this->oneEndState_.getName();
+
+    /* transitions */
+    content += "transitions:\n";
+
+    for(auto&& itStart: transitions_) {
+        auto start = itStart.first;
+
+        for(auto&& itLink: itStart.second) {
+            content += start.getName() + "," +
+                       itLink.first + " --> " +
+                       itLink.second.getName() + "\n";
+        }
+    }
+
+    content += "end.";
+}
+
+void Automaton::addState(State state)
+{
+    auto itState = std::find(this->listStates_.begin(), this->listStates_.end(), state);
+
+    if(itState != this->listStates_.end())
+        return;
+
+    this->listStates_.emplace_back(state);
+}
+
+void Automaton::addTransition(State startState, char symbol, State endState)
+{
+    StateLink link(symbol, endState);
+
+    if(std::find(alphabet_.begin(), alphabet_.end(), symbol) == alphabet_.end())
+        throw std::invalid_argument("addTransition: symbol does not exist");
+    if(std::find(listStates_.begin(), listStates_.end(), startState) == listStates_.end())
+        throw std::invalid_argument("addTransition: start state does not exist");
+    if(std::find(listStates_.begin(), listStates_.end(), link.second) == listStates_.end())
+        throw std::invalid_argument("addTransition: end state does not exist");
+
+    this->transitions_[startState].insert(link);
+}
+
+void Automaton::combineAutomaton(Automaton &other)
+{
+    if(this->alphabet_ != other.alphabet()) {
+        throw std::invalid_argument("Combine Automaton: alphabet does not match");
+    }
+
+    // add other's list states to this list states
+    for(auto state: other.listStates()) {
+        if(std::find(listStates_.begin(), listStates_.end(), state) == listStates_.end())
+            this->listStates_.emplace_back(state);
+    }
+
+    // move transition from other to this
+    for(auto&& itStart: other.transitions()) {
+        auto start = itStart.first;
+
+        for(auto&& itLink: itStart.second) {
+            this->addTransition(start.getName(), itLink.first, itLink.second.getName());
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)

@@ -7,7 +7,7 @@ class Union: public BaseNode
 {
 public:
     Union();
-    void ToNFA(Automaton& avtomat);
+    Automaton ToNFA(std::string alphabet, int& nodeCounter) override;
 };
 
 #endif // UNION_H

@@ -33,7 +33,6 @@ AST and nodes:
 
 
 Todo: 
-- Test build tree thoroughly
-- Convert to DFA
+- Test convert to NFA
 - Handle the case where some test vector fields is not present 
 - Unit Test

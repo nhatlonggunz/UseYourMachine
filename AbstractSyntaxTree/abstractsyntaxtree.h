@@ -13,9 +13,11 @@ public:
     AbstractSyntaxTree(BaseNode* root);
 
     std::string toString();
+    Automaton toNFA();
 
 private:
     std::string regex_;
+    std::string alphabet_;
     BaseNode* root_;
 
     // a wrapper to the recursive tree building

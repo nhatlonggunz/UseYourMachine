@@ -7,7 +7,7 @@ class Concatenation: public BaseNode
 {
 public:
     Concatenation();
-    void ToNFA(Automaton& avtomat) override;
+    Automaton ToNFA(std::string alphabet, int& nodeCounter) override;
 };
 
 #endif // CONCATENATION_H

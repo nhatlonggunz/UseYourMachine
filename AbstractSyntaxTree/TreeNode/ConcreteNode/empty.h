@@ -7,7 +7,7 @@ class Empty : public BaseNode
 {
 public:
     Empty();
-    void ToNFA(Automaton& avtomat) override;
+    Automaton ToNFA(std::string alphabet, int& nodeCounter) override;
 };
 
 #endif // EMPTY_H

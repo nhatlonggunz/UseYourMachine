@@ -11,7 +11,7 @@ public:
     BaseNode(char name);
     BaseNode(BaseNode* left, BaseNode *right);
 
-    virtual void ToNFA(Automaton& avtomat);
+    virtual Automaton ToNFA(std::string alphabet, int& nodeCounter) = 0;
     virtual void Operate(const std::vector<BaseNode*>& operands);
 
     BaseNode *left() const;

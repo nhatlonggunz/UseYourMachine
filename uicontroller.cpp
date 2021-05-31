@@ -87,15 +87,16 @@ void UIController::on_btnReadInputFile_clicked()
         std::istringstream ss(input);
 
         parser.ReadFromStream(ss);
-        Automaton avtomat_ = parser.getAutomaton();
+        Automaton avtomat = parser.getAutomaton();
+        this->avtomat_ = avtomat;
 
         // Write parsed content to file
         std::ofstream fo("ggout.txt");
-        fo << avtomat_;
+        fo << avtomat;
 
         // Write
         std::ostringstream os;
-        os << avtomat_;
+        os << avtomat;
         std::string text = os.str();
 
         ui->textboxOutputFile->setText(QString::fromStdString(text));
@@ -150,7 +151,7 @@ void UIController::LoadGraph()
     // Generate png from dot with GraphViz
     QProcess *dotProcess = new QProcess(this);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    qDebug() << env.toStringList();
+    // qDebug() << env.toStringList();
     dotProcess->setProcessEnvironment(env);
     dotProcess->start("dot", QStringList() << "-Tpng" << "-oautomaton.png" << "automaton.dot");
 

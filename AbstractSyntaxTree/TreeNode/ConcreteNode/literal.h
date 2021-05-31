@@ -8,7 +8,7 @@ class Literal: public BaseNode
 public:
     Literal();
     Literal(char name);
-    void ToNFA(Automaton& avtomat);
+    Automaton ToNFA(std::string alphabet, int& nodeCounter) override;
 };
 
 #endif // LITERAL_H

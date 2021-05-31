@@ -46,6 +46,10 @@ private:
     Transitions transitions_;
 
     State startState_;
+    std::vector<State> listEndStates_;
+
+    // this is used for thompson's construction, which only has one end state
+    State oneEndState_;
 
     // DFS to check if word belong to automaton
     void ValidateTransitionsInput();
@@ -54,20 +58,45 @@ private:
                              std::set<std::pair<State, int> > visited);
 public:
     Automaton(); // default construtor
+    Automaton(std::string alphabet);
     Automaton(std::string alphabet,
               std::vector<State> listStates,
               std::vector<State> listFinalStates_,
               Transitions transitions);
 
 
+    /* Automaton high level features: check dfa, to graph... */
     bool IsDFA() const;
     bool IsWordBelongTo(std::string word); // check if a word belongs to the Automaton
     void ValidateTestVector(bool testIsDFA,
                             bool testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
+
     std::string ToGraph();
+    std::string ToFileContent(std::string comment);
+
+    /* Automaton building */
+    void addState(State state);
+    void addTransition(State startState, char symbol, State endState);
+    void combineAutomaton(Automaton& other);
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
+
+
+    /* Getter and setters */
+    std::string alphabet() const;
+
+    std::vector<State> listStates() const;
+
+    Transitions transitions() const;
+
+    State startState() const;
+    void setStartState(const State &startState);
+
+    std::vector<State> listEndStates() const;
+    void setListEndStates(const std::vector<State> &listEndStates);
+    State oneEndState() const;
+    void setOneEndState(const State &oneEndState);
 };
 
 

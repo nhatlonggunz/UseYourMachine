@@ -17,11 +17,6 @@ BaseNode::BaseNode(BaseNode *left, BaseNode *right)
 
 }
 
-void BaseNode::ToNFA(Automaton &avtomat)
-{
-
-}
-
 void BaseNode::Operate(const std::vector<BaseNode *> &operands)
 {
     if(operands.size() != 2)

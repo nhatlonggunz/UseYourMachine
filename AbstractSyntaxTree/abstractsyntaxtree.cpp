@@ -2,6 +2,7 @@
 #include "TreeNode/basenodefactory.h"
 #include <algorithm>
 #include "regexparser.h"
+#include <iostream>
 
 AbstractSyntaxTree::AbstractSyntaxTree()
 {
@@ -13,11 +14,21 @@ AbstractSyntaxTree::AbstractSyntaxTree(std::string regex)
 {
     auto listTokens = RegexParser::Tokenize(regex);
     this->root_ = BuildFromTokens(listTokens);
+
+    // Make alphabet characters unique
+    std::sort(alphabet_.begin(), alphabet_.end());
+    auto itUnique = std::unique(alphabet_.begin(), alphabet_.end());
+    alphabet_.resize(std::distance(alphabet_.begin(), itUnique));
 }
 
 std::string AbstractSyntaxTree::toString()
 {
     return this->root_->toString();
+}
+
+Automaton AbstractSyntaxTree::toNFA()
+{
+    // return this->root_->ToNFA()
 }
 
 BaseNode* AbstractSyntaxTree::BuildFromTokens(std::vector<std::string> listTokens)
@@ -30,6 +41,8 @@ BaseNode* AbstractSyntaxTree::BuildFromTokens(std::vector<std::string> listToken
 BaseNode *AbstractSyntaxTree::BuildFromTokensUtil(std::vector<std::string> &listTokens)
 {
     char currentOperator = listTokens.back()[0];
+    if(currentOperator >= 'a' && currentOperator <= 'z')
+        this->alphabet_.append(std::string(1,currentOperator));
 
     BaseNode* currentNode = BaseNodeFactory::GetNode(currentOperator);
     listTokens.pop_back();
