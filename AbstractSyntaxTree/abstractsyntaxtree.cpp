@@ -28,7 +28,8 @@ std::string AbstractSyntaxTree::toString()
 
 Automaton AbstractSyntaxTree::toNFA()
 {
-    // return this->root_->ToNFA()
+    int nodeCounter = 0;
+    return this->root_->ToNFA(this->alphabet_, nodeCounter);
 }
 
 BaseNode* AbstractSyntaxTree::BuildFromTokens(std::vector<std::string> listTokens)

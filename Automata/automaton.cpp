@@ -55,6 +55,7 @@ State Automaton::oneEndState() const
 void Automaton::setOneEndState(const State &oneEndState)
 {
     oneEndState_ = oneEndState;
+    this->listEndStates_.emplace_back(oneEndState);
 }
 
 void Automaton::ValidateTransitionsInput()
@@ -127,7 +128,8 @@ Automaton::Automaton(std::string alphabet,
                      std::vector<State> listStates,
                      std::vector<State> listFinalStates,
                      Transitions transitions)
-    : alphabet_(alphabet), listStates_(listStates), transitions_(transitions)
+    : alphabet_(alphabet), listStates_(listStates), transitions_(transitions),
+      listEndStates_(listFinalStates)
 {
     ValidateTransitionsInput();
 
@@ -220,16 +222,15 @@ std::string Automaton::ToGraph()
 
     // end state
     content += "node [shape = doublecircle]; ";
-    for(auto&& s : listStates_) {
-        if(s.IsFinal())
-            content += s.getName() + " ";
+    for(auto&& s : listEndStates_) {
+        content += s.getName() + " ";
     }
     content += ";\n";
 
 
     // Draw remaining nodes. Draw edges
     content += "node [shape = circle];\n";
-    content += std::string("\"\" -> ") + "\"" + listStates_[0].getName() + "\"\n";
+    content += std::string("\"\" -> ") + "\"" + startState_.getName() + "\"\n";
 
     for(auto&& iter_f: transitions_) {
         for(auto&& iter_s: iter_f.second) {
@@ -261,7 +262,7 @@ std::string Automaton::ToFileContent(std::string comment)
     /* add list states. First state is alway the start state.*/
     content += "states: ";
 
-    content += startState_.getName();
+    content += startState_.getName() + ",";
 
     for(auto&& state: listStates_)
         if(state.getName() != startState_.getName())
@@ -271,7 +272,7 @@ std::string Automaton::ToFileContent(std::string comment)
     content += "\n";
 
     /* final states */
-    content += "final: " + this->oneEndState_.getName();
+    content += "final: " + this->oneEndState_.getName() + "\n";
 
     /* transitions */
     content += "transitions:\n";
@@ -287,6 +288,8 @@ std::string Automaton::ToFileContent(std::string comment)
     }
 
     content += "end.";
+
+    return content;
 }
 
 void Automaton::addState(State state)
@@ -303,7 +306,8 @@ void Automaton::addTransition(State startState, char symbol, State endState)
 {
     StateLink link(symbol, endState);
 
-    if(std::find(alphabet_.begin(), alphabet_.end(), symbol) == alphabet_.end())
+    if(std::find(alphabet_.begin(), alphabet_.end(), symbol) == alphabet_.end() &&
+       symbol != EMPTY_SYMBOL)
         throw std::invalid_argument("addTransition: symbol does not exist");
     if(std::find(listStates_.begin(), listStates_.end(), startState) == listStates_.end())
         throw std::invalid_argument("addTransition: start state does not exist");

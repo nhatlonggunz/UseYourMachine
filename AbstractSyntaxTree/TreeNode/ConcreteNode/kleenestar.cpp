@@ -13,8 +13,8 @@ Automaton KleeneStar::ToNFA(std::string alphabet, int &nodeCounter)
     Automaton avtomat(alphabet);
     avtomat.combineAutomaton(leftNFA);
 
-    State q("q" + std::to_string(nodeCounter));
-    State f("f" + std::to_string(nodeCounter));
+    State q("q" + std::to_string(nodeCounter++));
+    State f("f" + std::to_string(nodeCounter++));
 
     avtomat.addState(q);
     avtomat.addTransition(q, EMPTY_SYMBOL, leftNFA.startState());

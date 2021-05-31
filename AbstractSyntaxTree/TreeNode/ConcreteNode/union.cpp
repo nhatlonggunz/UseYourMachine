@@ -15,8 +15,8 @@ Automaton Union::ToNFA(std::string alphabet, int &nodeCounter)
     avtomat.combineAutomaton(leftNFA);
     avtomat.combineAutomaton(rightNFA);
 
-    State q("q" + std::to_string(nodeCounter));
-    State f("f" + std::to_string(nodeCounter));
+    State q("q" + std::to_string(nodeCounter++));
+    State f("f" + std::to_string(nodeCounter++));
 
     avtomat.addState(q);
     avtomat.addTransition(q, EMPTY_SYMBOL, leftNFA.startState());

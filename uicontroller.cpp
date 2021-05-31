@@ -173,5 +173,43 @@ void UIController::on_btnReadRegex_clicked()
     std::string regex = ui->txtboxInputRegex->text().toStdString();
 
     AbstractSyntaxTree ast(regex);
-    QMessageBox::information(this, "debug", QString::fromStdString(ast.toString()));
+    qDebug() << QString::fromStdString(ast.toString());
+
+    Automaton avtomat = ast.toNFA();
+
+    std::ofstream fo("NFA.txt");
+    std::string content = avtomat.ToFileContent("regex");
+    qDebug() << QString::fromStdString(content);
+    fo << content;
+    fo.close();
+
+
+    // generate dot file content
+    std::string dotContent = avtomat.ToGraph();
+
+    // Write to dot file
+    std::ofstream fo1("NFA.dot");
+    fo1 << dotContent;
+    fo1.close();
+
+    // Generate png from dot with GraphViz
+    QProcess *dotProcess = new QProcess(this);
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    // qDebug() << env.toStringList();
+    dotProcess->setProcessEnvironment(env);
+    dotProcess->start("dot", QStringList() << "-Tpng" << "-oNFA.png" << "NFA.dot");
+    dotProcess->waitForFinished();
+    dotProcess->close();
+
+    // Display the graph
+    QString filename = "NFA.png";
+    ui->lblGraph->setAlignment(Qt::AlignCenter);
+    QPixmap pix;
+
+    /** to check wether load ok */
+    if(pix.load(filename)) {
+        /** scale pixmap to fit in label'size and keep ratio of pixmap */
+//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
+        ui->lblGraph->setPixmap(pix);
+    }
 }
