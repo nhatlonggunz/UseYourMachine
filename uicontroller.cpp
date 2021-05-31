@@ -212,4 +212,16 @@ void UIController::on_btnReadRegex_clicked()
 //        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
         ui->lblGraph->setPixmap(pix);
     }
+
+    /* check finite and list all words in language */
+    std::vector<std::string> language;
+    qDebug() << avtomat.ListAllWords(language);
+
+    content = "";
+
+    for(auto&& word: language) {
+        content += word + "\n";
+    }
+
+    ui->textboxOutputFile->setText(QString::fromStdString(content));
 }

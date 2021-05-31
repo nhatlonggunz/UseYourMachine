@@ -56,6 +56,19 @@ private:
 
     bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
                              std::set<std::pair<State, int> > visited);
+
+    void DfsCheckFiniteLanguage(State currentState,
+                                std::unordered_set<State, StateHasher>& visited,
+                                std::unordered_set<State, StateHasher>& canReachEnd,
+                                std::unordered_set<State, StateHasher>& belongsToCycle,
+                                std::vector<State>& dfsStack);
+
+    void DfsPopulateLanguage(State currentState,
+                             std::unordered_set<State, StateHasher>& visited,
+                             std::unordered_set<State, StateHasher>& belongsToCycle,
+                             std::vector<std::string>& language,
+                             std::string currentWord = "");
+
 public:
     Automaton(); // default construtor
     Automaton(std::string alphabet);
@@ -71,6 +84,11 @@ public:
     void ValidateTestVector(bool testIsDFA,
                             bool testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
+
+    // Check if the Language represented by this automaton is finite
+    // if it is finte, generate all words belonging to the language
+    // @return true if the language is finite, false otherwise
+    bool ListAllWords(std::vector<std::string>& language);
 
     std::string ToGraph();
     std::string ToFileContent(std::string comment);
