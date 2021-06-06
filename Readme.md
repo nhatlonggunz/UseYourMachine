@@ -30,9 +30,8 @@ AST and nodes:
 
 - Build tree done
 - To string done
-
+- Convert Regex to NFA using Thompson's Construction.
 
 Todo: 
-- Test convert to NFA
 - Handle the case where some test vector fields is not present 
 - Unit Test
