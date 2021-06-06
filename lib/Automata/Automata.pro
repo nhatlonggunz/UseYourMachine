@@ -1,8 +1,7 @@
-TEMPLATE = subdirs
+CONFIG -= qt
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+TEMPLATE = lib
+CONFIG += staticlib
 
 CONFIG += c++11
 
@@ -22,9 +21,7 @@ SOURCES += \
     AbstractSyntaxTree/regexparser.cpp \
     Automata/automaton.cpp \
     Automata/parser.cpp \
-    Automata/state.cpp \
-    main.cpp \
-    uicontroller.cpp
+    Automata/state.cpp
 
 HEADERS += \
     AbstractSyntaxTree/TreeNode/ConcreteNode/concatenation.h \
@@ -38,16 +35,10 @@ HEADERS += \
     AbstractSyntaxTree/regexparser.h \
     Automata/automaton.h \
     Automata/parser.h \
-    Automata/state.h \
-    uicontroller.h
-
-FORMS += \
-    uicontroller.ui
+    Automata/state.h
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
+unix {
+    target.path = $$[QT_INSTALL_PLUGINS]/generic
+}
 !isEmpty(target.path): INSTALLS += target
-
-SUBDIRS += \
-    lib/Automata
