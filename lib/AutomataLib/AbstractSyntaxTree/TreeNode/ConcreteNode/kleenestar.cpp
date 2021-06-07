@@ -39,5 +39,5 @@ void KleeneStar::Operate(const std::vector<BaseNode *> &operands)
 
 std::string KleeneStar::toString()
 {
-    return "*(" + this->left_->toString() + ")";
+    return "(" + this->left_->toString() + ")*";
 }

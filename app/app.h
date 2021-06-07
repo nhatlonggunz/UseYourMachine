@@ -30,5 +30,6 @@ private:
     Automaton avtomat_;
 
     void LoadGraph(Automaton avtomat, std::string fileName);
+    void EnumerateLanguage(Automaton avtomat);
 };
 #endif // APP_H

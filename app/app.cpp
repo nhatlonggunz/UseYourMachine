@@ -70,6 +70,8 @@ void app::on_actionOpen_triggered()
         fo.close();
 
         LoadGraph(this->avtomat_, "automaton");
+        EnumerateLanguage(this->avtomat_);
+
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
     }
@@ -102,6 +104,8 @@ void app::on_btnReadInputFile_clicked()
         ui->textboxOutputFile->setText(QString::fromStdString(text));
 
         LoadGraph(this->avtomat_, "automaton");
+        EnumerateLanguage(this->avtomat_);
+
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
     }
@@ -173,29 +177,42 @@ void app::LoadGraph(Automaton avtomat, std::string fileName)
     }
 }
 
-void app::on_btnReadRegex_clicked()
+void app::EnumerateLanguage(Automaton avtomat)
 {
-    /* Create NFA from regex */
-    std::string regex = ui->txtboxInputRegex->text().toStdString();
-    AbstractSyntaxTree ast(regex);
-    Automaton avtomat = ast.toNFA();
-
-    /* Output the NFA to a file */
-    std::ofstream fo("NFA.txt");
-    std::string content = avtomat.ToFileContent("regex");
-    fo << content;
-    fo.close();
-
-    /* Show the NFA associated with the regex */
-    LoadGraph(avtomat, "NFA");
-
-    /* Check if the associated language is finite, enumerate if it is */
     std::vector<std::string> language;
-    content = "";
+
+    bool isLanguageFinite = avtomat.ListAllWords(language);
+    if(!isLanguageFinite)
+    {
+        ui->textboxListLanguage->setText("The associated language is not finite");
+        return;
+    }
+
+    std::string content = "";
 
     for(auto&& word: language) {
         content += word + "\n";
     }
 
-    ui->textboxOutputFile->setText(QString::fromStdString(content));
+    ui->textboxListLanguage->setText(QString::fromStdString(content));
+}
+
+void app::on_btnReadRegex_clicked()
+{
+    /* Create NFA from regex */
+    std::string regex = ui->txtboxInputRegex->text().toStdString();
+    AbstractSyntaxTree ast(regex);
+    this->avtomat_ = ast.toNFA();
+
+    /* Output the NFA to a file */
+    std::ofstream fo("NFA.txt");
+    std::string content = this->avtomat_.ToFileContent("regex");
+    fo << content;
+    fo.close();
+
+    /* Show the NFA associated with the regex */
+    LoadGraph(this->avtomat_, "NFA");
+
+    /* Check if the associated language is finite, enumerate if it is */
+    EnumerateLanguage(this->avtomat_);
 }

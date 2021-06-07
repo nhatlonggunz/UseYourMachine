@@ -2,6 +2,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 RegexParser::RegexParser()
 {
@@ -10,6 +11,9 @@ RegexParser::RegexParser()
 
 std::vector<std::string> RegexParser::Tokenize(std::string prefix)
 {
+    prefix.erase(std::remove(prefix.begin(), prefix.end(), ' '), prefix.end());
+    prefix.erase(std::remove(prefix.begin(), prefix.end(), '\t'), prefix.end());
+
     std::vector<std::string> listTokens;
     std::stack<std::string> st;
     std::string delimiter = ",()";
