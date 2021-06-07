@@ -29,6 +29,6 @@ private:
     Ui::app *ui;
     Automaton avtomat_;
 
-    void LoadGraph();
+    void LoadGraph(Automaton avtomat, std::string fileName);
 };
 #endif // APP_H

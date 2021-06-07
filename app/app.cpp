@@ -69,7 +69,7 @@ void app::on_actionOpen_triggered()
         fi.close();
         fo.close();
 
-        LoadGraph();
+        LoadGraph(this->avtomat_, "automaton");
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
     }
@@ -101,7 +101,7 @@ void app::on_btnReadInputFile_clicked()
 
         ui->textboxOutputFile->setText(QString::fromStdString(text));
 
-        LoadGraph();
+        LoadGraph(this->avtomat_, "automaton");
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
     }
@@ -138,13 +138,13 @@ void app::on_btnGenerateGraph_clicked()
     }
 }
 
-void app::LoadGraph()
+void app::LoadGraph(Automaton avtomat, std::string fileName)
 {
     // generate dot file content
-    std::string dotContent = avtomat_.ToGraph();
+    std::string dotContent = avtomat.ToGraph();
 
     // Write to dot file
-    std::ofstream fo("automaton.dot");
+    std::ofstream fo(fileName + ".dot");
     fo << dotContent;
     fo.close();
 
@@ -153,15 +153,20 @@ void app::LoadGraph()
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     // qDebug() << env.toStringList();
     dotProcess->setProcessEnvironment(env);
-    dotProcess->start("dot", QStringList() << "-Tpng" << "-oautomaton.png" << "automaton.dot");
+    dotProcess->start("dot",
+                      QStringList() << "-Tpng"
+                                    << ("-o" + fileName + ".png").c_str()
+                                    << (fileName + ".dot").c_str());
+    dotProcess->waitForFinished();
+    dotProcess->close();
 
     // Display the graph
-    QString filename = "automaton.png";
+    QString pngFileName = (fileName + ".png").c_str();
     ui->lblGraph->setAlignment(Qt::AlignCenter);
     QPixmap pix;
 
     /** to check wether load ok */
-    if(pix.load(filename)) {
+    if(pix.load(pngFileName)) {
         /** scale pixmap to fit in label'size and keep ratio of pixmap */
 //        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
         ui->lblGraph->setPixmap(pix);
@@ -183,35 +188,7 @@ void app::on_btnReadRegex_clicked()
     fo << content;
     fo.close();
 
-
-    // generate dot file content
-    std::string dotContent = avtomat.ToGraph();
-
-    // Write to dot file
-    std::ofstream fo1("NFA.dot");
-    fo1 << dotContent;
-    fo1.close();
-
-    // Generate png from dot with GraphViz
-    QProcess *dotProcess = new QProcess(this);
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    // qDebug() << env.toStringList();
-    dotProcess->setProcessEnvironment(env);
-    dotProcess->start("dot", QStringList() << "-Tpng" << "-oNFA.png" << "NFA.dot");
-    dotProcess->waitForFinished();
-    dotProcess->close();
-
-    // Display the graph
-    QString filename = "NFA.png";
-    ui->lblGraph->setAlignment(Qt::AlignCenter);
-    QPixmap pix;
-
-    /** to check wether load ok */
-    if(pix.load(filename)) {
-        /** scale pixmap to fit in label'size and keep ratio of pixmap */
-//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
-        ui->lblGraph->setPixmap(pix);
-    }
+    LoadGraph(avtomat, "NFA");
 
     /* check finite and list all words in language */
     std::vector<std::string> language;
