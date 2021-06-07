@@ -1,14 +1,14 @@
-#include "uicontroller.h"
-#include "ui_uicontroller.h"
+#include "app.h"
+#include "ui_app.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QProcess>
 #include <QTextCodec>
 
-#include "Automata/automaton.h"
-#include "Automata/parser.h"
-#include "AbstractSyntaxTree/abstractsyntaxtree.h"
+#include "../lib/AutomataLib/Automata/automaton.h"
+#include "../lib/AutomataLib/Automata/parser.h"
+#include "../lib/AutomataLib/AbstractSyntaxTree/abstractsyntaxtree.h"
 
 #include <iostream>
 #include <fstream>
@@ -17,19 +17,19 @@
 #include <QDebug>
 
 
-UIController::UIController(QWidget *parent)
+app::app(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::UIController)
+    , ui(new Ui::app)
 {
     ui->setupUi(this);
 }
 
-UIController::~UIController()
+app::~app()
 {
     delete ui;
 }
 
-void UIController::on_actionOpen_triggered()
+void app::on_actionOpen_triggered()
 {
     Parser parser = Parser();
 
@@ -75,7 +75,7 @@ void UIController::on_actionOpen_triggered()
     }
 }
 
-void UIController::on_btnReadInputFile_clicked()
+void app::on_btnReadInputFile_clicked()
 {
     Parser parser = Parser();
 
@@ -107,7 +107,7 @@ void UIController::on_btnReadInputFile_clicked()
     }
 }
 
-void UIController::on_btnGenerateGraph_clicked()
+void app::on_btnGenerateGraph_clicked()
 {
     std::string dotContent = avtomat_.ToGraph();
 
@@ -138,7 +138,7 @@ void UIController::on_btnGenerateGraph_clicked()
     }
 }
 
-void UIController::LoadGraph()
+void app::LoadGraph()
 {
     // generate dot file content
     std::string dotContent = avtomat_.ToGraph();
@@ -168,7 +168,7 @@ void UIController::LoadGraph()
     }
 }
 
-void UIController::on_btnReadRegex_clicked()
+void app::on_btnReadRegex_clicked()
 {
     std::string regex = ui->txtboxInputRegex->text().toStdString();
 

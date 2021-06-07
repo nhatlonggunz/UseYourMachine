@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "Automata/automaton.h"
+#include "automaton.h"
 #include "state.h"
 #include <iostream>
 #include <vector>

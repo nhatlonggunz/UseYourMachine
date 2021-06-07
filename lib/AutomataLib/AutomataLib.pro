@@ -37,6 +37,9 @@ HEADERS += \
     Automata/parser.h \
     Automata/state.h
 
+INCLUDEPATH += \
+    Automata
+
 # Default rules for deployment.
 unix {
     target.path = $$[QT_INSTALL_PLUGINS]/generic

@@ -1,20 +1,20 @@
-#ifndef UICONTROLLER_H
-#define UICONTROLLER_H
+#ifndef APP_H
+#define APP_H
 
 #include <QMainWindow>
-#include "Automata/automaton.h"
+#include "../lib/AutomataLib/Automata/automaton.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class UIController; }
+namespace Ui { class app; }
 QT_END_NAMESPACE
 
-class UIController : public QMainWindow
+class app : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    UIController(QWidget *parent = nullptr);
-    ~UIController();
+    app(QWidget *parent = nullptr);
+    ~app();
 
 private slots:
     void on_actionOpen_triggered(); // Open file
@@ -26,9 +26,9 @@ private slots:
     void on_btnReadRegex_clicked();
 
 private:
-    Ui::UIController *ui;
+    Ui::app *ui;
     Automaton avtomat_;
 
     void LoadGraph();
 };
-#endif // UICONTROLLER_H
+#endif // APP_H
