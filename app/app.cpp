@@ -60,7 +60,7 @@ void app::on_actionOpen_triggered()
         std::ofstream fo("ggout.txt");
         fo << avtomat_;
 
-        // Write
+        // Write to UI
         std::ostringstream os;
         os << avtomat_;
         std::string text = os.str();
@@ -94,7 +94,7 @@ void app::on_btnReadInputFile_clicked()
         std::ofstream fo("ggout.txt");
         fo << avtomat;
 
-        // Write
+        // Write to UI textbox
         std::ostringstream os;
         os << avtomat;
         std::string text = os.str();
@@ -140,18 +140,18 @@ void app::on_btnGenerateGraph_clicked()
 
 void app::LoadGraph(Automaton avtomat, std::string fileName)
 {
-    // generate dot file content
+    /* Output graphviz .dot file from automata */
     std::string dotContent = avtomat.ToGraph();
 
-    // Write to dot file
     std::ofstream fo(fileName + ".dot");
     fo << dotContent;
     fo.close();
 
-    // Generate png from dot with GraphViz
+    /* Generate png from dot with GraphViz */
     QProcess *dotProcess = new QProcess(this);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     // qDebug() << env.toStringList();
+
     dotProcess->setProcessEnvironment(env);
     dotProcess->start("dot",
                       QStringList() << "-Tpng"
@@ -160,7 +160,7 @@ void app::LoadGraph(Automaton avtomat, std::string fileName)
     dotProcess->waitForFinished();
     dotProcess->close();
 
-    // Display the graph
+    /* Display the graph */
     QString pngFileName = (fileName + ".png").c_str();
     ui->lblGraph->setAlignment(Qt::AlignCenter);
     QPixmap pix;
@@ -175,25 +175,22 @@ void app::LoadGraph(Automaton avtomat, std::string fileName)
 
 void app::on_btnReadRegex_clicked()
 {
+    /* Create NFA from regex */
     std::string regex = ui->txtboxInputRegex->text().toStdString();
-
     AbstractSyntaxTree ast(regex);
-    qDebug() << QString::fromStdString(ast.toString());
-
     Automaton avtomat = ast.toNFA();
 
+    /* Output the NFA to a file */
     std::ofstream fo("NFA.txt");
     std::string content = avtomat.ToFileContent("regex");
-    qDebug() << QString::fromStdString(content);
     fo << content;
     fo.close();
 
+    /* Show the NFA associated with the regex */
     LoadGraph(avtomat, "NFA");
 
-    /* check finite and list all words in language */
+    /* Check if the associated language is finite, enumerate if it is */
     std::vector<std::string> language;
-    qDebug() << avtomat.ListAllWords(language);
-
     content = "";
 
     for(auto&& word: language) {
