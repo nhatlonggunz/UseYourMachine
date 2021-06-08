@@ -116,12 +116,12 @@ bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int
     return false;
 }
 
-void Automaton::DfsCheckFiniteLanguage(
-        State currentState,
+void Automaton::DfsCheckFiniteLanguage(State currentState,
         std::unordered_set<State, StateHasher> &visited,
         std::unordered_set<State, StateHasher> &canReachEnd,
         std::unordered_set<State, StateHasher> &belongsToCycle,
-        std::vector<State> &dfsStack)
+        std::vector<State> &dfsStack,
+        std::vector<char> &weightStack)
 {
     visited.insert(currentState);
     dfsStack.emplace_back(currentState);
@@ -133,16 +133,33 @@ void Automaton::DfsCheckFiniteLanguage(
     for(auto&& links: transitions_[currentState]) {
         State nextState = links.second;
 
+        std::vector<State>::iterator itStartCycle;
         // tree edge
         if(!visited.count(nextState)) {
-            DfsCheckFiniteLanguage(nextState, visited, canReachEnd, belongsToCycle, dfsStack);
+            weightStack.emplace_back(links.first);
+            DfsCheckFiniteLanguage(nextState, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
+            weightStack.pop_back();
         }
         // back edge
-        else if(std::find(dfsStack.begin(), dfsStack.end(), State(nextState)) != dfsStack.end()) {
-            for(auto it = dfsStack.rbegin(); it != dfsStack.rend(); ++it) {
-                belongsToCycle.insert(*it);
-                if(it->getName() == nextState.getName())
-                    break;
+        else if((itStartCycle = std::find(dfsStack.begin(), dfsStack.end(), State(nextState))) != dfsStack.end()) {
+            bool onlyEmpty = true;
+
+            if(links.first != EMPTY_SYMBOL)
+                onlyEmpty = false;
+
+            if(onlyEmpty) {
+                unsigned startCycleIndex = itStartCycle - dfsStack.begin();
+                for(unsigned i = startCycleIndex; i < weightStack.size(); ++i) {
+                    if(weightStack[i] != EMPTY_SYMBOL)
+                        onlyEmpty = false;
+                }
+            }
+
+            if(!onlyEmpty) {
+                unsigned startCycleIndex = itStartCycle - dfsStack.begin();
+                for(unsigned i = startCycleIndex; i < dfsStack.size(); ++i) {
+                    belongsToCycle.insert(dfsStack[i]);
+                }
             }
         }
 
@@ -286,21 +303,29 @@ bool Automaton::ListAllWords(std::vector<std::string>& language)
 {
     std::unordered_set<State, StateHasher> visited;
     std::unordered_set<State, StateHasher> canReachEnd;
+    // note: only contain states belong to a non-empty weight cycle
     std::unordered_set<State, StateHasher> belongsToCycle;
     std::vector<State> dfsStack;
+    std::vector<char> weightStack;
 
-    DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack);
+    /* Check if the NFA has a finite language */
+    DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
 
+    // the language is infinite if:
+    // - exist a state can reach a final state
+    // - that state belongs to a non-empty weights cycle
     for(auto&& state: listStates_) {
         if(canReachEnd.count(state) && belongsToCycle.count(state)) {
             return false;
         }
     }
 
+    /* Populate the language */
     language.clear();
     visited.clear();
     DfsPopulateLanguage(startState_, visited, belongsToCycle, language);
 
+    // get unique language
     std::sort(language.begin(), language.end());
     auto uniqueId = std::unique(language.begin(), language.end());
     language.resize(std::distance(language.begin(), uniqueId));

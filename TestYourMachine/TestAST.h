@@ -39,7 +39,7 @@ INSTANTIATE_TEST_SUITE_P(InfiniteRegex,
 std::vector<RegexTestData> listFiniteRegex = {
     RegexTestData {"|(.(a,b), c))", "((a.b)|c)", true, {"ab", "c"}},
     RegexTestData {"|(.(a,|(a,b)), c))", "((a.(a|b))|c)", true, {"aa", "ab", "c"}},
-    RegexTestData {"*(_)", "(_)*", true, {}},
+    RegexTestData {"*(_)", "(_)*", true, {""}},
 //    RegexTestData {"|(.(.(|(*(a),b),*(c)), *(d)), .(|(e,a), *(c)))",
 //                   "(((((a)*|b).(c)*).(d)*)|((e|a).(c)*))",
 //                   true, {}},

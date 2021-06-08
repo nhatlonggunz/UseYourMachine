@@ -20,6 +20,7 @@ SOURCES += \
     AbstractSyntaxTree/abstractsyntaxtree.cpp \
     AbstractSyntaxTree/regexparser.cpp \
     Automata/automaton.cpp \
+    Automata/nfatodfaconverter.cpp \
     Automata/parser.cpp \
     Automata/state.cpp
 
@@ -34,6 +35,7 @@ HEADERS += \
     AbstractSyntaxTree/abstractsyntaxtree.h \
     AbstractSyntaxTree/regexparser.h \
     Automata/automaton.h \
+    Automata/nfatodfaconverter.h \
     Automata/parser.h \
     Automata/state.h
 

@@ -61,7 +61,8 @@ private:
                                 std::unordered_set<State, StateHasher>& visited,
                                 std::unordered_set<State, StateHasher>& canReachEnd,
                                 std::unordered_set<State, StateHasher>& belongsToCycle,
-                                std::vector<State>& dfsStack);
+                                std::vector<State>& dfsStack,
+                                std::vector<char>& weightStack);
 
     void DfsPopulateLanguage(State currentState,
                              std::unordered_set<State, StateHasher>& visited,
