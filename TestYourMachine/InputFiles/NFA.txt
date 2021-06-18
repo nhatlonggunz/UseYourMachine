@@ -8,3 +8,11 @@ q1,_ --> q2
 q0,a --> q1
 q2,b --> q3
 end.
+
+dfa: n
+finite	:	y
+
+words:
+ab,y
+a,n
+end.
