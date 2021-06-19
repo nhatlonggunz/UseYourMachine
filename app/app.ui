@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1308</width>
-    <height>672</height>
+    <width>1480</width>
+    <height>881</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,7 +92,7 @@
       <x>500</x>
       <y>10</y>
       <width>791</width>
-      <height>621</height>
+      <height>401</height>
      </rect>
     </property>
     <property name="text">
@@ -158,6 +158,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="lblGraphDFA">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>430</y>
+      <width>791</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
    <zorder>lblGraph</zorder>
    <zorder>textboxInputFile</zorder>
    <zorder>textboxOutputFile</zorder>
@@ -170,13 +183,14 @@
    <zorder>btnReadRegex</zorder>
    <zorder>label_4</zorder>
    <zorder>textboxListLanguage</zorder>
+   <zorder>lblGraphDFA</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1308</width>
+     <width>1480</width>
      <height>21</height>
     </rect>
    </property>

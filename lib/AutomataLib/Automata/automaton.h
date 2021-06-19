@@ -98,6 +98,7 @@ public:
     void addState(State state);
     void addTransition(State startState, char symbol, State endState);
     void combineAutomaton(Automaton& other);
+    bool isStateExisted(State& state);
 
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 
@@ -116,6 +117,8 @@ public:
     void setListEndStates(const std::vector<State> &listEndStates);
     State oneEndState() const;
     void setOneEndState(const State &oneEndState);
+
+    void addEndState(State& s);
 };
 
 

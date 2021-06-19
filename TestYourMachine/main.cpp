@@ -1,4 +1,5 @@
 #include "TestAST.h"
+#include "TestGeneral.h"
 
 #include <gtest/gtest.h>
 

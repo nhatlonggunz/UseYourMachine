@@ -16,6 +16,7 @@
 #include <sstream>
 #include <QDebug>
 
+#include "Automata/nfatodfaconverter.h"
 
 app::app(QWidget *parent)
     : QMainWindow(parent)
@@ -69,7 +70,7 @@ void app::on_actionOpen_triggered()
         fi.close();
         fo.close();
 
-        LoadGraph(this->avtomat_, "automaton");
+        LoadGraph(this->avtomat_, "automaton", ui->lblGraph);
         EnumerateLanguage(this->avtomat_);
 
     }  catch (const std::invalid_argument& ia) {
@@ -103,7 +104,7 @@ void app::on_btnReadInputFile_clicked()
 
         ui->textboxOutputFile->setText(QString::fromStdString(text));
 
-        LoadGraph(this->avtomat_, "automaton");
+        LoadGraph(this->avtomat_, "automaton", ui->lblGraph);
         EnumerateLanguage(this->avtomat_);
 
     }  catch (const std::invalid_argument& ia) {
@@ -142,7 +143,7 @@ void app::on_btnGenerateGraph_clicked()
     }
 }
 
-void app::LoadGraph(Automaton avtomat, std::string fileName)
+void app::LoadGraph(Automaton avtomat, std::string fileName, QLabel* label)
 {
     /* Output graphviz .dot file from automata */
     std::string dotContent = avtomat.ToGraph();
@@ -166,14 +167,14 @@ void app::LoadGraph(Automaton avtomat, std::string fileName)
 
     /* Display the graph */
     QString pngFileName = (fileName + ".png").c_str();
-    ui->lblGraph->setAlignment(Qt::AlignCenter);
+    label->setAlignment(Qt::AlignCenter);
     QPixmap pix;
 
     /** to check wether load ok */
     if(pix.load(pngFileName)) {
         /** scale pixmap to fit in label'size and keep ratio of pixmap */
 //        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
-        ui->lblGraph->setPixmap(pix);
+        label->setPixmap(pix);
     }
 }
 
@@ -211,8 +212,13 @@ void app::on_btnReadRegex_clicked()
     fo.close();
 
     /* Show the NFA associated with the regex */
-    LoadGraph(this->avtomat_, "NFA");
+    LoadGraph(this->avtomat_, "NFA", ui->lblGraph);
 
     /* Check if the associated language is finite, enumerate if it is */
     EnumerateLanguage(this->avtomat_);
+
+    /* Generate DFA */
+    NFAToDFAConverter converter(this->avtomat_);
+    Automaton dfa = converter.getDFA();
+    LoadGraph(dfa, "DFA", ui->lblGraphDFA);
 }

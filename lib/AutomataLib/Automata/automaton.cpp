@@ -58,6 +58,15 @@ void Automaton::setOneEndState(const State &oneEndState)
     this->listEndStates_.emplace_back(oneEndState);
 }
 
+void Automaton::addEndState(State &s)
+{
+    this->listEndStates_.emplace_back(s);
+    std::sort(listEndStates_.begin(), listEndStates_.end());
+
+    auto itUnique = std::unique(listEndStates_.begin(), listEndStates_.end());
+    listEndStates_.resize(std::distance(listEndStates_.begin(), itUnique));
+}
+
 void Automaton::ValidateTransitionsInput()
 {
     // check if starting state is a valid state
@@ -357,9 +366,9 @@ std::string Automaton::ToGraph()
             std::string formattedSymbol = std::string(1, iter_s.first);
             if(formattedSymbol == "_")
                 formattedSymbol = "\u03B5";
-            content += iter_f.first.getName();
+            content += "\"" + iter_f.first.getName() + "\"";
             content += " -> ";
-            content += iter_s.second.getName();
+            content += "\"" + iter_s.second.getName() + "\"";
             content += std::string("[label = \"") + formattedSymbol + "\"];\n";
         }
     }
@@ -457,6 +466,12 @@ void Automaton::combineAutomaton(Automaton &other)
             this->addTransition(start.getName(), itLink.first, itLink.second.getName());
         }
     }
+}
+
+bool Automaton::isStateExisted(State &state)
+{
+    auto it = std::find(listStates_.begin(), listStates_.end(), state);
+    return it != listStates_.end();
 }
 
 std::ostream& operator<<(std::ostream& os, const Automaton& avtomat)
