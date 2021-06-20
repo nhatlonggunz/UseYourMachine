@@ -105,7 +105,6 @@ public:
 
     /* Getter and setters */
     std::string alphabet() const;
-
     std::vector<State> listStates() const;
 
     Transitions transitions() const;

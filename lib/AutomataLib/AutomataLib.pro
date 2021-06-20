@@ -23,6 +23,7 @@ SOURCES += \
     Automata/nfatodfaconverter.cpp \
     Automata/parser.cpp \
     Automata/pushdownautomaton.cpp \
+    Automata/pushdownstatelink.cpp \
     Automata/state.cpp
 
 HEADERS += \
@@ -39,6 +40,7 @@ HEADERS += \
     Automata/nfatodfaconverter.h \
     Automata/parser.h \
     Automata/pushdownautomaton.h \
+    Automata/pushdownstatelink.h \
     Automata/state.h
 
 INCLUDEPATH += \
