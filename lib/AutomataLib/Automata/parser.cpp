@@ -7,15 +7,19 @@
 
 Parser::Parser()
 {
-
+    testIsDFA_ = false;
+    testIsFinite_ = false;
 }
 
 void Parser::ReadFromStream(std::istream &in)
 {
-    std::string alphabet;
+    std::string alphabet = "#";
+    std::string stack = "#";
     std::vector<State> listStates;
     std::vector<State> listFinalStates;
+
     Transitions transitions;
+    PushdownTransitions pdTransitions;
 
     std::string line;
 
@@ -33,6 +37,11 @@ void Parser::ReadFromStream(std::istream &in)
             std::smatch sm;
             std::regex_search(line, sm, std::regex("[^:]*$"));
             alphabet = sm[0];
+        }
+        if(std::regex_search(line, std::regex("^stack:"))) {
+            std::smatch sm;
+            std::regex_search(line, sm, std::regex("[^:]*$"));
+            stack = sm[0];
         }
         if(std::regex_search(line, std::regex("^states:"))) {
             std::smatch sm;
@@ -52,9 +61,6 @@ void Parser::ReadFromStream(std::istream &in)
 
             listFinalStates = ReadStates(input);
         }
-        if(std::regex_search(line, std::regex("^transitions:"))) {
-            ReadTransitions(in, transitions);
-        }
         if(line.size() == 5 && line.substr(0, 3) == "dfa") {
             char tmp = line[4]; // format is "dfa:y"
             this->testIsDFA_ = (tmp == 'y');
@@ -68,7 +74,37 @@ void Parser::ReadFromStream(std::istream &in)
         }
     }
 
-    avtomat_ = Automaton(alphabet, listStates, listFinalStates, transitions);
+    in.clear();
+    in.seekg(0);
+
+    while(std::getline(in, line))
+    {
+        // preprocess string
+        line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+        trim(line);
+
+
+        if(std::regex_search(line, std::regex("^transitions:"))) {
+            if(stack == "#" && alphabet == "#")
+                throw std::invalid_argument("stack and alphabet cannot be null");
+            else if(stack != "#") { // pushdown automaton
+                ReadPushdownTrainsitions(in, pdTransitions);
+            }
+            else
+                ReadTransitions(in, transitions);
+        }
+    }
+
+    if(stack != "#") // pushdown automaton
+    {
+        avtomat_ = PushDownAutomaton(alphabet, stack, listStates, listFinalStates, pdTransitions);
+        newAvtomat_ = new PushDownAutomaton(alphabet, stack, listStates, listFinalStates, pdTransitions);
+    }
+    else{
+        avtomat_ = Automaton(alphabet, listStates, listFinalStates, transitions);
+        newAvtomat_ = new Automaton(alphabet, listStates, listFinalStates, transitions);
+    }
 }
 
 // trim from start (in place)
@@ -109,6 +145,11 @@ bool Parser::getTestIsFinite() const
 bool Parser::getTestIsDFA() const
 {
     return testIsDFA_;
+}
+
+Automaton *Parser::getNewAvtomat() const
+{
+    return newAvtomat_;
 }
 
 std::vector<State> Parser::ReadStates(std::string input)
@@ -156,6 +197,55 @@ void Parser::ReadTransitions(std::istream& is, Transitions& transitions)
         State dest = State(str);
 
         transitions[start].insert(StateLink(symbol, dest));
+    }
+}
+
+void Parser::ReadPushdownTrainsitions(std::istream &is, PushdownTransitions &transitions)
+{
+    std::string line;
+
+    while(std::getline(is, line))
+    {
+        // preprocess string
+        line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+        trim(line);
+
+        if(line.size() == 0 || line[0] == '#')
+            continue;
+        if(line == "end.")
+            break;
+
+        std::smatch sm;
+        std::regex_search(line, sm, std::regex("^([A-Za-z0-9]+),"));
+        std::string str = sm[1]; // State name
+        State start = State(str);
+
+        std::regex_search(line, sm, std::regex("^[A-Za-z0-9]+,([a-z_])"));
+        str = sm[1]; // transition symbol
+        char symbol = str[0];
+
+        // pop and push symbol
+        std::regex_search(line, sm, std::regex("^[A-Za-z0-9]+,[a-z_]\\[([_a-z,]*)\\]"));
+        char popSymbol = '#';
+        char pushSymbol = '#';
+
+        if(sm.size() == 0) {
+            popSymbol = pushSymbol = '_';
+        }
+        else {
+            str = sm[1];
+            popSymbol = str[0];
+            pushSymbol = str.back();
+        }
+
+        std::regex_search(line, sm, std::regex("-->([A-Za-z0-9]+)$"));
+        str = sm[1]; // Destination state
+        State dest = State(str);
+
+        PushdownStateLink link(symbol, popSymbol, pushSymbol, dest);
+
+        transitions[start].insert(link);
     }
 }
 

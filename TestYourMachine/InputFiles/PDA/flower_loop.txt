@@ -1,0 +1,37 @@
+alphabet: abc
+stack: abcxyzlmnijk
+states: S,T,A,B,C,X,Y,Z,L,M,N
+final: A
+
+transitions:
+S,_[_,i] --> T
+
+T,_[i,a] --> A
+A,_[_,b] --> B
+B,_[_,c] --> C
+C,_[_,j] --> T
+
+T,_[j,x] --> X
+X,_[_,y] --> Y
+Y,_[_,z] --> Z
+Z,_[_,k] --> T
+
+T,_[k,l] --> L
+L,_[_,m] --> M
+M,_[_,n] --> N
+N,_[_,i] --> T
+
+end.
+
+dfa: n
+finite: n
+
+words:
+abcc,n
+aacc,n
+bbbccc,n
+aaabbcccc,n
+aabbccccc,n
+bbaccc,n
+aaaabbbacccccccc,n
+end.

@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <functional>
 #include <set>
+#include <iostream>
 
 #include "state.h"
 
@@ -55,7 +56,7 @@ private:
     void ValidateTransitionsInput();
 
     bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
-                             std::set<std::pair<State, int> > visited);
+                             std::set<std::pair<State, int> >& visited);
 
     void DfsCheckFiniteLanguage(State currentState,
                                 std::unordered_set<State, StateHasher>& visited,
@@ -77,14 +78,26 @@ public:
               std::vector<State> listStates,
               std::vector<State> listFinalStates_,
               Transitions transitions);
+    // general automaton (constructor for subclasses to use)
+    Automaton(std::string alphabet,
+              std::vector<State> listStates,
+              std::vector<State> listFinalStates_);
+    virtual ~Automaton() {}
 
 
     /* Automaton high level features: check dfa, to graph... */
     bool IsDFA() const;
-    bool IsWordBelongTo(std::string word); // check if a word belongs to the Automaton
+
+    // check if a word belongs to the Automaton
+    virtual bool IsWordBelongTo(std::string word) {
+        std::set<std::pair<State,int>> visited;
+        return IsWordBelongTo_Util(startState_, word, 0, visited);
+    }
+
     void ValidateTestVector(bool testIsDFA,
                             bool testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
+    void ValidateTestWords(std::vector<std::pair<std::string, bool> > testWords);
 
     // Check if the Language represented by this automaton is finite
     // if it is finte, generate all words belonging to the language

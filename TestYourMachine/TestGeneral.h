@@ -13,15 +13,10 @@
 #include <vector>
 #include <cstring>
 
+#include <typeinfo>
+
 using namespace testing;
 
-
-
-class TestAutomatonFixture:
-        public testing::TestWithParam<std::string>
-{
-
-};
 
 std::vector<std::string> getTestInputFiles(std::string subFolder) {
 
@@ -29,7 +24,7 @@ std::vector<std::string> getTestInputFiles(std::string subFolder) {
     getcwd(tmp, 256);
 
     std::string filesPath(tmp);
-    filesPath += "\\InputFiles";
+    filesPath += "\\InputFiles" + subFolder;
 
     DIR *dir; struct dirent *diread;
     std::vector<std::string> files;
@@ -48,11 +43,17 @@ std::vector<std::string> getTestInputFiles(std::string subFolder) {
     return files;
 }
 
-INSTANTIATE_TEST_SUITE_P(SampleInputFiles,
-                         TestAutomatonFixture,
-                         testing::ValuesIn(getTestInputFiles("")));
+class TestDFAFixture:
+        public testing::TestWithParam<std::string>
+{
 
-TEST_P(TestAutomatonFixture, TestAutomaton) {
+};
+
+INSTANTIATE_TEST_SUITE_P(SampleInputFiles,
+                         TestDFAFixture,
+                         testing::ValuesIn(getTestInputFiles("\\DFA")));
+
+TEST_P(TestDFAFixture, TestDFA) {
     std::string path = GetParam();
 
     std::ifstream fi(path);
@@ -68,6 +69,66 @@ TEST_P(TestAutomatonFixture, TestAutomaton) {
     auto testWords = parser.getTestWords();
 
     EXPECT_NO_THROW(avtomat.ValidateTestVector(isDFA, isFinite, testWords));
+}
+
+
+/* test NFA */
+class TestNFAFixture:
+        public testing::TestWithParam<std::string>
+{
+
+};
+
+INSTANTIATE_TEST_SUITE_P(SampleInputFiles,
+                         TestNFAFixture,
+                         testing::ValuesIn(getTestInputFiles("\\NFA")));
+
+TEST_P(TestNFAFixture, TestNFA) {
+    std::string path = GetParam();
+
+    std::ifstream fi(path);
+    EXPECT_TRUE(fi.good());
+
+    Parser parser;
+    parser.ReadFromStream(fi);
+    Automaton avtomat = parser.getAutomaton();
+
+    // Validate test vector
+    auto isDFA = parser.getTestIsDFA();
+    auto isFinite = parser.getTestIsFinite();
+    auto testWords = parser.getTestWords();
+
+    EXPECT_NO_THROW(avtomat.ValidateTestVector(isDFA, isFinite, testWords));
+}
+
+/* test PDA */
+class TestPDAFixture:
+        public testing::TestWithParam<std::string>
+{
+
+};
+
+INSTANTIATE_TEST_SUITE_P(SampleInputFiles,
+                         TestPDAFixture,
+                         testing::ValuesIn(getTestInputFiles("\\PDA")));
+
+TEST_P(TestPDAFixture, TestPDA) {
+    std::string path = GetParam();
+
+    std::ifstream fi(path);
+    EXPECT_TRUE(fi.good());
+
+    Parser parser;
+    parser.ReadFromStream(fi);
+    Automaton* avtomat = parser.getNewAvtomat();
+
+    PushDownAutomaton* pdtmp = dynamic_cast<PushDownAutomaton*>(avtomat);
+
+    EXPECT_FALSE(pdtmp == nullptr);
+
+    auto testWords = parser.getTestWords();
+
+    EXPECT_NO_THROW(pdtmp->ValidateTestWords(testWords));
 }
 
 

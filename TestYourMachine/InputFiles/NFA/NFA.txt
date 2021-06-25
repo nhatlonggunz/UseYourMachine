@@ -4,8 +4,8 @@ alphabet: ab
 states: q0,q1,q2,q3
 final: q3
 transitions:
-q1,_ --> q2
 q0,a --> q1
+q1,_ --> q2
 q2,b --> q3
 end.
 

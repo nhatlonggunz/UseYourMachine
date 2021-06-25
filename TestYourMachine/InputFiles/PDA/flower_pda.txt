@@ -1,0 +1,57 @@
+alphabet: abc
+stack: abcdefxyzlmnijkh
+states: S,T,A,B,C,X,Y,Z,L,D,E,F,G1,G2,G3,G4,G5,G6,G7,G8,G9,G10,G11,G12
+final: G12
+
+transitions:
+S,_[_,i] --> T
+
+T,_[i,a] --> A
+A,_[_,b] --> B
+B,_[_,c] --> C
+C,_[_,j] --> T
+
+T,_[j,x] --> X
+X,_[_,y] --> Y
+Y,_[_,z] --> Z
+Z,_[_,k] --> T
+
+T,_[k,l] --> L
+L,_[_,m] --> M
+M,_[_,n] --> N
+N,_[_,h] --> T
+
+T,_[h,d] --> D
+D,_[_,e] --> E
+E,_[_,f] --> F
+F,_[f,f] --> T
+
+T,a[f,_] --> G1
+G1,a[e,_] --> G2
+G2,a[d,_] --> G3
+G3,a[n,_] --> G4
+G4,a[m,_] --> G5
+G5,a[l,_] --> G6
+G6,a[z,_] --> G7
+G7,a[y,_] --> G8
+G8,a[x,_] --> G9
+G9,a[c,_] --> G10
+G10,a[b,_] --> G11
+G11,a[a,_] --> G12
+
+
+end.
+
+dfa: n
+finite: n
+
+words:
+abcc,n
+aacc,n
+bbbccc,n
+aaabbcccc,n
+aabbccccc,n
+bbaccc,n
+aaaabbbacccccccc,n
+aaaaaaaaaaaa,y
+end.

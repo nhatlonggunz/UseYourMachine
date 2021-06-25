@@ -17,6 +17,8 @@ public:
 
     State toState() const;
 
+    bool operator<(const PushdownStateLink& other) const;
+
 private:
     char symbol_;
     char popSymbol_;
@@ -27,5 +29,13 @@ private:
 struct PushdownStateLinkHasher {
     std::size_t operator()(const PushdownStateLink& s) const;
 };
+
+inline bool operator == (PushdownStateLink const& lhs, PushdownStateLink const& rhs)
+{
+    return lhs.symbol() == rhs.symbol() &&
+            lhs.popSymbol() == rhs.popSymbol() &&
+            lhs.pushSymbol() == rhs.pushSymbol() &&
+            lhs.toState() == rhs.toState();
+}
 
 #endif // PUSHDOWNSTATELINK_H

@@ -100,7 +100,7 @@ void Automaton::ValidateTransitionsInput()
 }
 
 bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex,
-                                    std::set<std::pair<State,int>> visited)
+                                    std::set<std::pair<State,int>>& visited)
 {
     // end of word, end up at a final state.
     if(wordIndex == (int)word.length() && curState.IsFinal())
@@ -251,6 +251,12 @@ Automaton::Automaton(std::string alphabet,
     }
 }
 
+Automaton::Automaton(std::string alphabet, std::vector<State> listStates, std::vector<State> listFinalStates_)
+    :alphabet_(alphabet), listStates_(listStates), listEndStates_(listFinalStates_)
+{
+    startState_ = listStates_[0];
+}
+
 
 // Every state must have |alphabet| ingoing and outgoing edges.
 // Hence a DFA has |alphabet| * |state|,
@@ -276,10 +282,7 @@ bool Automaton::IsDFA() const
     return sumDegree == (int)listStates_.size() * (int)alphabet_.size();
 }
 
-bool Automaton::IsWordBelongTo(std::string word)
-{
-    return IsWordBelongTo_Util(startState_, word, 0, std::set<std::pair<State, int>>());
-}
+
 
 void Automaton::ValidateTestVector(bool testIsDFA, bool testIsFinite, std::vector<std::pair<std::string, bool> > testWords)
 {
@@ -294,6 +297,54 @@ void Automaton::ValidateTestVector(bool testIsDFA, bool testIsFinite, std::vecto
 
         throw std::invalid_argument(error);
     }
+
+    bool isFiniteDFA = true;
+
+    std::unordered_set<State, StateHasher> visited;
+    std::unordered_set<State, StateHasher> canReachEnd;
+    // note: only contain states belong to a non-empty weight cycle
+    std::unordered_set<State, StateHasher> belongsToCycle;
+    std::vector<State> dfsStack;
+    std::vector<char> weightStack;
+
+    /* Check if the NFA has a finite language */
+    DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
+
+    // the language is infinite if:
+    // - exist a state can reach a final state
+    // - that state belongs to a non-empty weights cycle
+    for(auto&& state: listStates_) {
+        if(canReachEnd.count(state) && belongsToCycle.count(state)) {
+            isFiniteDFA = false;
+        }
+    }
+
+    if(isFiniteDFA  != testIsFinite) {
+        std::string error = std::string("This automaton is") +
+                            (isFiniteDFA ? "" : " not") +
+                            " finite. While test vector is" +
+                            (testIsFinite ? "" : " not") +
+                            " finite.";
+
+        throw std::invalid_argument(error);
+    }
+
+    for(auto&& testWord: testWords) {
+        bool belongsToAutomaton = this->IsWordBelongTo(testWord.first);
+
+        if(belongsToAutomaton != testWord.second) {
+            std::string error = testWord.first +
+                                (belongsToAutomaton ? " belongs to" : " does not belong to") +
+                                "  DFA. While test vector says it" +
+                                (testWord.second ? " belongs to" : " does not belong to") +
+                                " DFA.";
+            throw std::invalid_argument(error);
+        }
+    }
+}
+
+void Automaton::ValidateTestWords(std::vector<std::pair<std::string, bool> > testWords)
+{
     for(auto&& testWord: testWords) {
         bool belongsToAutomaton = this->IsWordBelongTo(testWord.first);
 

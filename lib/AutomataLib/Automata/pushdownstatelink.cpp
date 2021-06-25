@@ -31,6 +31,24 @@ State PushdownStateLink::toState() const
     return toState_;
 }
 
+bool PushdownStateLink::operator<(const PushdownStateLink &other) const
+{
+    /* The transition precedence is: prioritize non-empty symbol
+     * (transition symbol first then pop stack symbol)
+     *
+     * Hence need to sort transitions by transition symbol, then pop stack symbol
+     * _ must go last in consideration */
+
+    // "_" (empty symbol) must go last in the order.
+    // "_" has higher value than uppercase letter
+    if(this->symbol() != other.symbol()) {
+        return toupper(this->symbol()) < toupper(other.symbol());
+    }
+
+    // "_" pop stack must go last in the order
+    return toupper(this->popSymbol()) < toupper(other.popSymbol());
+}
+
 std::size_t PushdownStateLinkHasher::operator()(const PushdownStateLink &s) const
 {
     using std::hash;
