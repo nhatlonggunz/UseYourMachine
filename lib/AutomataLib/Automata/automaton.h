@@ -55,9 +55,6 @@ private:
     // DFS to check if word belong to automaton
     void ValidateTransitionsInput();
 
-    bool IsWordBelongTo_Util(const State &curState, std::string word, int wordIndex,
-                             std::set<std::pair<State, int> >& visited);
-
     void DfsCheckFiniteLanguage(State currentState,
                                 std::unordered_set<State, StateHasher>& visited,
                                 std::unordered_set<State, StateHasher>& canReachEnd,
@@ -90,8 +87,9 @@ public:
 
     // check if a word belongs to the Automaton
     virtual bool IsWordBelongTo(std::string word) {
-        std::set<std::pair<State,int>> visited;
-        return IsWordBelongTo_Util(startState_, word, 0, visited);
+//        std::set<std::pair<State,int>> visited;
+//        return IsWordBelongTo_Util(startState_, word, 0, visited);
+        throw std::invalid_argument("Not implemented");
     }
 
     void ValidateTestVector(int testIsDFA,
@@ -101,7 +99,9 @@ public:
     // Check if the Language represented by this automaton is finite
     // if it is finte, generate all words belonging to the language
     // @return true if the language is finite, false otherwise
-    bool ListAllWords(std::vector<std::string>& language);
+    virtual bool ListAllWords(std::vector<std::string>& language) {
+        return false;
+    };
 
     virtual std::string toGraph() { return ""; };
     virtual std::string toFileContent(std::string comment) {return"";};

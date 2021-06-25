@@ -20,11 +20,13 @@ else:unix: LIBS += -L$$OUT_PWD/../lib/AutomataLib/ -lAutomataLib
 INCLUDEPATH += $$PWD/../lib/AutomataLib
 DEPENDPATH += $$PWD/../lib/AutomataLib
 
+### copy test input files to build folder
 copydata.commands = $(COPY_DIR) $$shell_path($$PWD/InputFiles) $$shell_path($$OUT_PWD/InputFiles)
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
 QMAKE_EXTRA_TARGETS += first copydata
+###
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/AutomataLib/release/libAutomataLib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/AutomataLib/debug/libAutomataLib.a

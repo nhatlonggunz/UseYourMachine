@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include <set>
-
 #include "finitestateautomaton.h"
 
 // StateLinkHasher for HashMap
@@ -99,34 +98,6 @@ void Automaton::ValidateTransitionsInput()
             }
         }
     }
-}
-
-bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int wordIndex,
-                                    std::set<std::pair<State,int>>& visited)
-{
-    // end of word, end up at a final state.
-    if(wordIndex == (int)word.length() &&
-       std::find(listEndStates_.begin(), listEndStates_.end(), curState)
-            != listEndStates_.end())
-        return true;
-
-    for(auto&& edge: this->transitions_[curState]) {
-        char transSymbol = edge.first;
-        State nextState = edge.second;
-
-        std::pair<State,int> nextDfsState(nextState, wordIndex + (transSymbol != EMPTY_SYMBOL));
-
-        if((transSymbol == EMPTY_SYMBOL || transSymbol == word[wordIndex]) &&
-                !visited.count(nextDfsState))
-        {
-            visited.insert(nextDfsState);
-            if(IsWordBelongTo_Util(nextDfsState.first, word,
-                                   nextDfsState.second, visited))
-                return true;
-        }
-    }
-
-    return false;
 }
 
 void Automaton::DfsCheckFiniteLanguage(State currentState,
@@ -356,40 +327,6 @@ void Automaton::ValidateTestVector(int testIsDFAInput, int testIsFiniteInput, st
             throw std::invalid_argument(error);
         }
     }
-}
-
-bool Automaton::ListAllWords(std::vector<std::string>& language)
-{
-    std::unordered_set<State, StateHasher> visited;
-    std::unordered_set<State, StateHasher> canReachEnd;
-    // note: only contain states belong to a non-empty weight cycle
-    std::unordered_set<State, StateHasher> belongsToCycle;
-    std::vector<State> dfsStack;
-    std::vector<char> weightStack;
-
-    /* Check if the NFA has a finite language */
-    DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
-
-    // the language is infinite if:
-    // - exist a state can reach a final state
-    // - that state belongs to a non-empty weights cycle
-    for(auto&& state: listStates_) {
-        if(canReachEnd.count(state) && belongsToCycle.count(state)) {
-            return false;
-        }
-    }
-
-    /* Populate the language */
-    language.clear();
-    visited.clear();
-    DfsPopulateLanguage(startState_, visited, belongsToCycle, language);
-
-    // get unique language
-    std::sort(language.begin(), language.end());
-    auto uniqueId = std::unique(language.begin(), language.end());
-    language.resize(std::distance(language.begin(), uniqueId));
-
-    return true;
 }
 
 void Automaton::addState(State state)

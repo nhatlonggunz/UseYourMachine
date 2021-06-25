@@ -72,7 +72,9 @@ void app::on_actionOpen_triggered()
         fo.close();
 
         LoadGraph(avtomat, "automaton", ui->lblGraph);
-        EnumerateLanguage(*avtomat);
+        EnumerateLanguage(avtomat);
+
+        delete avtomat;
 
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
@@ -113,7 +115,7 @@ void app::on_btnReadInputFile_clicked()
         fo.close();
 
         LoadGraph(avtomat, "automaton", ui->lblGraph);
-        EnumerateLanguage(*avtomat);
+        EnumerateLanguage(avtomat);
 
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
@@ -156,11 +158,11 @@ void app::LoadGraph(Automaton* avtomat, std::string fileName, QLabel* label)
     }
 }
 
-void app::EnumerateLanguage(Automaton avtomat)
+void app::EnumerateLanguage(Automaton* avtomat)
 {
     std::vector<std::string> language;
 
-    bool isLanguageFinite = avtomat.ListAllWords(language);
+    bool isLanguageFinite = avtomat->ListAllWords(language);
     if(!isLanguageFinite)
     {
         ui->textboxListLanguage->setText("The associated language is not finite DFA");
@@ -194,7 +196,7 @@ void app::on_btnReadRegex_clicked()
     LoadGraph(fsa, "NFA", ui->lblGraph);
 
 //    /* Check if the associated language is finite, enumerate if it is */
-    EnumerateLanguage(*fsa);
+    EnumerateLanguage(fsa);
 
     /* Generate DFA */
     NFAToDFAConverter converter(fsa);

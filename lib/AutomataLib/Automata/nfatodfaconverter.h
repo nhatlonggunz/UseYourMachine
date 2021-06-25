@@ -28,7 +28,6 @@ private:
 
     void exploreState(State curState, FiniteStateAutomaton& dfa, std::queue<State>& qu);
     FiniteStateAutomaton ConvertToDFA();
-
 };
 
 bool NFAToDFAStateComparer(State a, State b);

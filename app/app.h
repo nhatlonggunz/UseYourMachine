@@ -31,6 +31,6 @@ private:
 
     void LoadGraph(Automaton avtomat, std::string fileName, QLabel* label);
     void LoadGraph(Automaton* avtomat, std::string fileName, QLabel* label);
-    void EnumerateLanguage(Automaton avtomat);
+    void EnumerateLanguage(Automaton* avtomat);
 };
 #endif // APP_H
