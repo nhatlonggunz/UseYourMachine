@@ -7,6 +7,7 @@ class FiniteStateAutomaton : public Automaton
 {
 public:
     FiniteStateAutomaton();
+    FiniteStateAutomaton(std::string alphabet);
     FiniteStateAutomaton(std::string alphabet,
                          std::vector<State> listStates,
                          std::vector<State> listFinalStates_,
@@ -19,9 +20,14 @@ public:
                             bool testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
 
+    bool ListAllWords(std::vector<std::string>& language);
+
     /* Automaton building */
     void addTransition(State startState, char symbol, State endState);
     void combineAutomaton(FiniteStateAutomaton& other);
+
+    std::string toGraph() override;
+    std::string toFileContent(std::string comment) override;
 
     Transitions transitions() const;
 
@@ -40,6 +46,12 @@ private:
                                 std::unordered_set<State, StateHasher>& belongsToCycle,
                                 std::vector<State>& dfsStack,
                                 std::vector<char>& weightStack);
+
+    void DfsPopulateLanguage(State currentState,
+                             std::unordered_set<State, StateHasher>& visited,
+                             std::unordered_set<State, StateHasher>& belongsToCycle,
+                             std::vector<std::string>& language,
+                             std::string currentWord = "");
 };
 
 #endif // FINITESTATEAUTOMATON_H

@@ -24,7 +24,6 @@ public:
     // The pushdown automaton must be deterministic
     bool IsWordBelongTo(std::string word) override;
 
-
     void addTransition(State startState, char symbol, char popSymbol, char pushSymbol, State toState);
 
 private:

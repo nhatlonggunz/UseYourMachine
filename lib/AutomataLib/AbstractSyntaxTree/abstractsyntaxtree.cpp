@@ -26,7 +26,7 @@ std::string AbstractSyntaxTree::toString()
     return this->root_->toString();
 }
 
-Automaton AbstractSyntaxTree::toNFA()
+FiniteStateAutomaton AbstractSyntaxTree::toNFA()
 {
     int nodeCounter = 0;
     return this->root_->ToNFA(this->alphabet_, nodeCounter);

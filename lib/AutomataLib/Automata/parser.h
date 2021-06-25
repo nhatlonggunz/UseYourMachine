@@ -16,8 +16,8 @@ private:
 
     // Test vector
     std::vector<std::pair<std::string, bool>> testWords_;
-    bool testIsFinite_;
-    bool testIsDFA_;
+    int testIsFinite_;
+    int testIsDFA_;
 
 
     /* Parsing utilities */
@@ -34,8 +34,8 @@ public:
 
     Automaton getAutomaton();
     std::vector<std::pair<std::string, bool> > getTestWords() const;
-    bool getTestIsFinite() const;
-    bool getTestIsDFA() const;
+    int getTestIsFinite() const;
+    int getTestIsDFA() const;
 
     /* string utilities */
     static inline void ltrim(std::string &s);

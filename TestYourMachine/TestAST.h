@@ -58,7 +58,8 @@ TEST_P(BasicRegexTestFixture, basicRegex) {
     EXPECT_EQ(ast.toString(), testData.infixRegex);
 
     std::vector<std::string> language;
-    bool isLanguageFinite = ast.toNFA().ListAllWords(language);
+    FiniteStateAutomaton avtomat = ast.toNFA();
+    bool isLanguageFinite = avtomat.ListAllWords(language);
 
     EXPECT_EQ(testData.isLanguageFinite, isLanguageFinite);
     EXPECT_THAT(testData.language, testing::UnorderedElementsAreArray(language));

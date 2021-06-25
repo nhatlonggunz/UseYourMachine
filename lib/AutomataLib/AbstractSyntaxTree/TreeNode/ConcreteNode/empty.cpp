@@ -6,9 +6,9 @@ Empty::Empty()
     nodeContentName_ = '_';
 }
 
-Automaton Empty::ToNFA(std::string alphabet, int &nodeCounter)
+FiniteStateAutomaton Empty::ToNFA(std::string alphabet, int &nodeCounter)
 {
-    Automaton avtomat(alphabet);
+    FiniteStateAutomaton avtomat(alphabet);
 
     State q("q" + std::to_string(nodeCounter++));
     State f("q" + std::to_string(nodeCounter++));

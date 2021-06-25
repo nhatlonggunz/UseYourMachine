@@ -6,7 +6,7 @@
 #include <QProcess>
 #include <QTextCodec>
 
-#include "../lib/AutomataLib/Automata/automaton.h"
+#include "../lib/AutomataLib/Automata/finitestateautomaton.h"
 #include "../lib/AutomataLib/Automata/parser.h"
 #include "../lib/AutomataLib/AbstractSyntaxTree/abstractsyntaxtree.h"
 
@@ -178,6 +178,41 @@ void app::LoadGraph(Automaton avtomat, std::string fileName, QLabel* label)
     }
 }
 
+void app::LoadGraph(Automaton* avtomat, std::string fileName, QLabel* label)
+{
+    /* Output graphviz .dot file from automata */
+    std::string dotContent = avtomat->toGraph();
+
+    std::ofstream fo(fileName + ".dot");
+    fo << dotContent;
+    fo.close();
+
+    /* Generate png from dot with GraphViz */
+    QProcess *dotProcess = new QProcess(this);
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    // qDebug() << env.toStringList();
+
+    dotProcess->setProcessEnvironment(env);
+    dotProcess->start("dot",
+                      QStringList() << "-Tpng"
+                                    << ("-o" + fileName + ".png").c_str()
+                                    << (fileName + ".dot").c_str());
+    dotProcess->waitForFinished();
+    dotProcess->close();
+
+    /* Display the graph */
+    QString pngFileName = (fileName + ".png").c_str();
+    label->setAlignment(Qt::AlignCenter);
+    QPixmap pix;
+
+    /** to check wether load ok */
+    if(pix.load(pngFileName)) {
+        /** scale pixmap to fit in label'size and keep ratio of pixmap */
+//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
+        label->setPixmap(pix);
+    }
+}
+
 void app::EnumerateLanguage(Automaton avtomat)
 {
     std::vector<std::string> language;
@@ -203,22 +238,25 @@ void app::on_btnReadRegex_clicked()
     /* Create NFA from regex */
     std::string regex = ui->txtboxInputRegex->text().toStdString();
     AbstractSyntaxTree ast(regex);
-    this->avtomat_ = ast.toNFA();
+    FiniteStateAutomaton* fsa = new FiniteStateAutomaton(ast.toNFA());
+//    this->avtomat_ = ast.toNFA();
 
     /* Output the NFA to a file */
     std::ofstream fo("NFA.txt");
-    std::string content = this->avtomat_.ToFileContent("regex");
+    std::string content = fsa->toFileContent("regex");
     fo << content;
     fo.close();
 
     /* Show the NFA associated with the regex */
-    LoadGraph(this->avtomat_, "NFA", ui->lblGraph);
+    LoadGraph(fsa, "NFA", ui->lblGraph);
 
-    /* Check if the associated language is finite, enumerate if it is */
-    EnumerateLanguage(this->avtomat_);
+//    /* Check if the associated language is finite, enumerate if it is */
+    EnumerateLanguage(*fsa);
 
     /* Generate DFA */
-    NFAToDFAConverter converter(this->avtomat_);
+    NFAToDFAConverter converter(fsa);
     Automaton dfa = converter.getDFA();
     LoadGraph(dfa, "DFA", ui->lblGraphDFA);
+
+    delete fsa;
 }

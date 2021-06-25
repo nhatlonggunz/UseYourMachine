@@ -2,7 +2,7 @@
 #define APP_H
 
 #include <QMainWindow>
-#include "../lib/AutomataLib/Automata/automaton.h"
+#include "../lib/AutomataLib/Automata/finitestateautomaton.h"
 
 #include <QMessageBox>
 
@@ -32,6 +32,7 @@ private:
     Automaton avtomat_;
 
     void LoadGraph(Automaton avtomat, std::string fileName, QLabel* label);
+    void LoadGraph(Automaton* avtomat, std::string fileName, QLabel* label);
     void EnumerateLanguage(Automaton avtomat);
 };
 #endif // APP_H

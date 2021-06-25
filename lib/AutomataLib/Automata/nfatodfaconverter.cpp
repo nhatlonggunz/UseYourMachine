@@ -7,7 +7,7 @@ NFAToDFAConverter::NFAToDFAConverter()
 
 }
 
-NFAToDFAConverter::NFAToDFAConverter(Automaton nfa)
+NFAToDFAConverter::NFAToDFAConverter(FiniteStateAutomaton* nfa)
     : nfa_(nfa)
 {
 
@@ -21,7 +21,7 @@ std::vector<State> NFAToDFAConverter::findClosure(State nfaState)
 
     /* graph traverse to all states in the closure */
     for(unsigned i = 0; i < statesInClosure.size(); ++i) {
-        auto setEdges = this->nfa_.transitions()[statesInClosure[i]];
+        auto setEdges = this->nfa_->transitions()[statesInClosure[i]];
 
         // Traverse through all Epsilon edges
         for(auto&& link: setEdges) {
@@ -40,7 +40,7 @@ std::vector<State> NFAToDFAConverter::findClosure(State nfaState)
 Automaton NFAToDFAConverter::getDFA()
 {
     /* Generate closures from all states */
-    for(auto&& state: this->nfa_.listStates()) {
+    for(auto&& state: this->nfa_->listStates()) {
         closures_[state] = findClosure(state);
     }
 
@@ -91,7 +91,7 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
     std::vector<State> nfaStates = dfaStateToNFAStates(curState);
 
     for(auto&& state: nfaStates) {
-        auto edges = this->nfa_.transitions()[state];
+        auto edges = this->nfa_->transitions()[state];
 
         for(auto&& link: edges) {
             for(auto&& closureState: this->closures_[link.second]) {
@@ -103,7 +103,7 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
 
     State sink("_");
 
-    for(char c: this->nfa_.alphabet()) {
+    for(char c: this->nfa_->alphabet()) {
         // There exist an unused char in alphabet
         // must connect to sink
         if(reachableStates[c - 'a'].empty()) {
@@ -111,7 +111,7 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
             if(!dfa.isStateExisted(sink))
             {
                 dfa.addState(sink);
-                for(char ch: this->nfa_.alphabet()) {
+                for(char ch: this->nfa_->alphabet()) {
                     dfa.addTransition(sink, ch, sink);
                 }
             }
@@ -124,7 +124,7 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
                 dfa.addState(newState);
                 qu.push(newState);
 
-                for(auto&& nfaEndState: this->nfa_.listEndStates()) {
+                for(auto&& nfaEndState: this->nfa_->listEndStates()) {
                     for(auto&& state: reachableStates[c - 'a']) {
                         if(state.getName() == nfaEndState.getName()) {
                             dfa.addEndState(newState);
@@ -141,10 +141,10 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
 
 Automaton NFAToDFAConverter::ConvertToDFA()
 {
-    Automaton dfa(this->nfa_.alphabet());
+    Automaton dfa(this->nfa_->alphabet());
 
     /* Add init state */
-    State initDfaState = createDfaState(findClosure(this->nfa_.startState()));
+    State initDfaState = createDfaState(findClosure(this->nfa_->startState()));
     this->dfaStates_.insert(initDfaState);
 
     dfa.addState(initDfaState);

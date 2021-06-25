@@ -94,10 +94,9 @@ public:
         return IsWordBelongTo_Util(startState_, word, 0, visited);
     }
 
-    void ValidateTestVector(bool testIsDFA,
-                            bool testIsFinite,
+    void ValidateTestVector(int testIsDFA,
+                            int testIsFinite,
                             std::vector<std::pair<std::string, bool> > testWords);
-    void ValidateTestWords(std::vector<std::pair<std::string, bool> > testWords);
 
     // Check if the Language represented by this automaton is finite
     // if it is finte, generate all words belonging to the language
@@ -106,6 +105,9 @@ public:
 
     std::string ToGraph();
     std::string ToFileContent(std::string comment);
+
+    virtual std::string toGraph() { return ""; };
+    virtual std::string toFileContent(std::string comment) {return"";};
 
     /* Automaton building */
     void addState(State state);

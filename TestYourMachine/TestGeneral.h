@@ -132,7 +132,7 @@ TEST_P(TestPDAFixture, TestPDA) {
 
     auto testWords = parser.getTestWords();
 
-    EXPECT_NO_THROW(pdtmp->ValidateTestWords(testWords));
+    EXPECT_NO_THROW(pdtmp->ValidateTestVector(0, 0, testWords));
 
     delete avtomat;
 }

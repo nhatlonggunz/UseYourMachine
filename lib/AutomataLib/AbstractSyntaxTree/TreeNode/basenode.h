@@ -1,7 +1,7 @@
 #ifndef BASENODE_H
 #define BASENODE_H
 
-#include "Automata/automaton.h"
+#include "Automata/finitestateautomaton.h"
 #include "vector"
 
 class BaseNode
@@ -11,7 +11,7 @@ public:
     BaseNode(char name);
     BaseNode(BaseNode* left, BaseNode *right);
 
-    virtual Automaton ToNFA(std::string alphabet, int& nodeCounter) = 0;
+    virtual FiniteStateAutomaton ToNFA(std::string alphabet, int& nodeCounter) = 0;
     virtual void Operate(const std::vector<BaseNode*>& operands);
 
     BaseNode *left() const;

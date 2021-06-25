@@ -6,6 +6,12 @@ FiniteStateAutomaton::FiniteStateAutomaton()
 
 }
 
+FiniteStateAutomaton::FiniteStateAutomaton(std::string alphabet)
+    : Automaton(alphabet)
+{
+
+}
+
 FiniteStateAutomaton::FiniteStateAutomaton(
         std::string alphabet,
         std::vector<State> listStates,
@@ -104,6 +110,40 @@ void FiniteStateAutomaton::ValidateTestVector(bool testIsDFA, bool testIsFinite,
     }
 }
 
+bool FiniteStateAutomaton::ListAllWords(std::vector<std::string> &language)
+{
+    std::unordered_set<State, StateHasher> visited;
+    std::unordered_set<State, StateHasher> canReachEnd;
+    // note: only contain states belong to a non-empty weight cycle
+    std::unordered_set<State, StateHasher> belongsToCycle;
+    std::vector<State> dfsStack;
+    std::vector<char> weightStack;
+
+    /* Check if the NFA has a finite language */
+    DfsCheckFiniteLanguage(this->startState(), visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
+
+    // the language is infinite if:
+    // - exist a state can reach a final state
+    // - that state belongs to a non-empty weights cycle
+    for(auto&& state: this->listStates()) {
+        if(canReachEnd.count(state) && belongsToCycle.count(state)) {
+            return false;
+        }
+    }
+
+    /* Populate the language */
+    language.clear();
+    visited.clear();
+    DfsPopulateLanguage(this->startState(), visited, belongsToCycle, language);
+
+    // get unique language
+    std::sort(language.begin(), language.end());
+    auto uniqueId = std::unique(language.begin(), language.end());
+    language.resize(std::distance(language.begin(), uniqueId));
+
+    return true;
+}
+
 void FiniteStateAutomaton::addTransition(State startState, char symbol, State endState)
 {
     StateLink link(symbol, endState);
@@ -144,6 +184,85 @@ void FiniteStateAutomaton::combineAutomaton(FiniteStateAutomaton &other)
             this->addTransition(start.getName(), itLink.first, itLink.second.getName());
         }
     }
+}
+
+std::string FiniteStateAutomaton::toGraph()
+{
+    // start string
+    std::string content = "digraph Automaton {\n"
+                          "rankdir=LR;\n"
+                          "\"\" [shape=none]\n";
+
+    // end state
+    content += "node [shape = doublecircle]; ";
+    for(auto&& s : this->listEndStates()) {
+        content += s.getName() + " ";
+    }
+    content += ";\n";
+
+
+    // Draw remaining nodes. Draw edges
+    content += "node [shape = circle];\n";
+    content += std::string("\"\" -> ") + "\"" + this->startState().getName() + "\"\n";
+
+    for(auto&& iter_f: transitions_) {
+        for(auto&& iter_s: iter_f.second) {
+            std::string formattedSymbol = std::string(1, iter_s.first);
+            if(formattedSymbol == "_")
+                formattedSymbol = "\u03B5";
+            content += "\"" + iter_f.first.getName() + "\"";
+            content += " -> ";
+            content += "\"" + iter_s.second.getName() + "\"";
+            content += std::string("[label = \"") + formattedSymbol + "\"];\n";
+        }
+    }
+
+    content += "}";
+
+    return content;
+}
+
+std::string FiniteStateAutomaton::toFileContent(std::string comment)
+{
+    std::string content;
+
+    if(comment != "") {
+        content += "#" + comment + "\n\n";
+    }
+
+    content += "alphabet: " + this->alphabet() + "\n";
+
+    /* add list states. First state is alway the start state.*/
+    content += "states: ";
+
+    content += this->startState().getName() + ",";
+
+    for(auto&& state: this->listStates())
+        if(state.getName() != this->startState().getName())
+            content += state.getName() + ",";
+
+    content.pop_back();
+    content += "\n";
+
+    /* final states */
+    content += "final: " + this->oneEndState().getName() + "\n";
+
+    /* transitions */
+    content += "transitions:\n";
+
+    for(auto&& itStart: transitions_) {
+        auto start = itStart.first;
+
+        for(auto&& itLink: itStart.second) {
+            content += start.getName() + "," +
+                       itLink.first + " --> " +
+                       itLink.second.getName() + "\n";
+        }
+    }
+
+    content += "end.";
+
+    return content;
 }
 
 Transitions FiniteStateAutomaton::transitions() const
@@ -229,4 +348,32 @@ void FiniteStateAutomaton::DfsCheckFiniteLanguage(State currentState, std::unord
     }
 
     dfsStack.pop_back();
+}
+
+void FiniteStateAutomaton::DfsPopulateLanguage(State currentState, std::unordered_set<State, StateHasher> &visited, std::unordered_set<State, StateHasher> &belongsToCycle, std::vector<std::string> &language, std::string currentWord)
+{
+    visited.insert(currentState);
+
+    auto listEndStates_ = this->listEndStates();
+    // end state
+    if(std::find(listEndStates_.begin(), listEndStates_.end(), currentState) != listEndStates_.end())
+    {
+        language.push_back(currentWord);
+    }
+
+    for(auto&& link: transitions_[currentState]) {
+        State nextState = link.second;
+        char weight = link.first;
+
+        if(!visited.count(nextState) && !belongsToCycle.count(nextState)) {
+
+            DfsPopulateLanguage(nextState,
+                                visited,
+                                belongsToCycle,
+                                language,
+                                currentWord + (weight == EMPTY_SYMBOL? "" : std::string(1, weight)));
+        }
+    }
+
+    visited.erase(currentState);
 }

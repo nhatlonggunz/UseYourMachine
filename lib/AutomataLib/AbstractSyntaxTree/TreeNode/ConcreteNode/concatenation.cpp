@@ -6,12 +6,12 @@ Concatenation::Concatenation()
     nodeContentName_ = '.';
 }
 
-Automaton Concatenation::ToNFA(std::string alphabet, int& nodeCounter)
+FiniteStateAutomaton Concatenation::ToNFA(std::string alphabet, int& nodeCounter)
 {
-    Automaton leftNFA = this->left_->ToNFA(alphabet, nodeCounter);
-    Automaton rightNFA = this->right_->ToNFA(alphabet, nodeCounter);
+    FiniteStateAutomaton leftNFA = this->left_->ToNFA(alphabet, nodeCounter);
+    FiniteStateAutomaton rightNFA = this->right_->ToNFA(alphabet, nodeCounter);
 
-    Automaton avtomat(alphabet);
+    FiniteStateAutomaton avtomat(alphabet);
     avtomat.combineAutomaton(leftNFA);
     avtomat.combineAutomaton(rightNFA);
 

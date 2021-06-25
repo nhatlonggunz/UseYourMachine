@@ -6,11 +6,11 @@ KleeneStar::KleeneStar()
     nodeContentName_ = '*';
 }
 
-Automaton KleeneStar::ToNFA(std::string alphabet, int &nodeCounter)
+FiniteStateAutomaton KleeneStar::ToNFA(std::string alphabet, int &nodeCounter)
 {
-    Automaton leftNFA = this->left_->ToNFA(alphabet, nodeCounter);
+    FiniteStateAutomaton leftNFA = this->left_->ToNFA(alphabet, nodeCounter);
 
-    Automaton avtomat(alphabet);
+    FiniteStateAutomaton avtomat(alphabet);
     avtomat.combineAutomaton(leftNFA);
 
     State q("q" + std::to_string(nodeCounter++));

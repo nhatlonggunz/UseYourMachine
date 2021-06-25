@@ -1,7 +1,7 @@
 #ifndef NFATODFACONVERTER_H
 #define NFATODFACONVERTER_H
 
-#include "automaton.h"
+#include "finitestateautomaton.h"
 #include <queue>
 
 /*
@@ -11,15 +11,16 @@ class NFAToDFAConverter
 {
 public:
     NFAToDFAConverter();
-    NFAToDFAConverter(Automaton nfa);
+    NFAToDFAConverter(FiniteStateAutomaton* nfa);
 
 
     Automaton getDFA();
 
 private:
-    Automaton nfa_;
+    FiniteStateAutomaton* nfa_;
     std::unordered_map<State, std::vector<State>, StateHasher> closures_;
     std::unordered_set<State, StateHasher> dfaStates_;
+
 
     State createDfaState(std::vector<State> nfaStates);
     std::vector<State> dfaStateToNFAStates(State dfaState);

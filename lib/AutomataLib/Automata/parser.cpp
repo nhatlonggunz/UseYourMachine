@@ -8,8 +8,8 @@
 
 Parser::Parser()
 {
-    testIsDFA_ = false;
-    testIsFinite_ = false;
+    testIsDFA_ = 0;
+    testIsFinite_ = 0;
 }
 
 void Parser::ReadFromStream(std::istream &in)
@@ -64,11 +64,11 @@ void Parser::ReadFromStream(std::istream &in)
         }
         if(line.size() == 5 && line.substr(0, 3) == "dfa") {
             char tmp = line[4]; // format is "dfa:y"
-            this->testIsDFA_ = (tmp == 'y');
+            this->testIsDFA_ = (tmp == 'y'? 1 : -1);
         }
         if(line.size() == 8 && line.substr(0, 6) == "finite") {
             char tmp = line[7]; // finite:n
-            this->testIsFinite_ = (tmp == 'y');
+            this->testIsFinite_ = (tmp == 'y'? 1 : -1);
         }
         if(line.size() == 6 && line == "words:") {
             ReadTestWords(in);
@@ -138,12 +138,12 @@ std::vector<std::pair<std::string, bool> > Parser::getTestWords() const
     return testWords_;
 }
 
-bool Parser::getTestIsFinite() const
+int Parser::getTestIsFinite() const
 {
     return testIsFinite_;
 }
 
-bool Parser::getTestIsDFA() const
+int Parser::getTestIsDFA() const
 {
     return testIsDFA_;
 }

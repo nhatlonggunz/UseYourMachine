@@ -8,7 +8,7 @@ class KleeneStar: public BaseNode
 public:
     KleeneStar();
 
-    Automaton ToNFA(std::string alphabet, int& nodeCounter) override;
+    FiniteStateAutomaton ToNFA(std::string alphabet, int& nodeCounter) override;
     void Operate(const std::vector<BaseNode *> &operands) override;
     std::string toString();
 };

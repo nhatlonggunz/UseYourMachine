@@ -2,7 +2,7 @@
 #define ABSTRACTSYNTAXTREE_H
 
 #include "TreeNode/basenode.h"
-#include "Automata/automaton.h"
+#include "Automata/finitestateautomaton.h"
 #include <vector>
 
 class AbstractSyntaxTree
@@ -13,7 +13,7 @@ public:
     AbstractSyntaxTree(BaseNode* root);
 
     std::string toString();
-    Automaton toNFA();
+    FiniteStateAutomaton toNFA();
 
 private:
     std::string regex_;

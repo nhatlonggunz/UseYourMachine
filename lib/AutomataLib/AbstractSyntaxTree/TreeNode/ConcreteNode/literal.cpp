@@ -12,9 +12,9 @@ Literal::Literal(char name)
     this->nodeContentName_ = name;
 }
 
-Automaton Literal::ToNFA(std::string alphabet, int &nodeCounter)
+FiniteStateAutomaton Literal::ToNFA(std::string alphabet, int &nodeCounter)
 {
-    Automaton avtomat(alphabet);
+    FiniteStateAutomaton avtomat(alphabet);
 
     State q("q" + std::to_string(nodeCounter++));
     State f("q" + std::to_string(nodeCounter++));
