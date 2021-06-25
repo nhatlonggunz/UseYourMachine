@@ -4,6 +4,8 @@
 #include <string>
 #include <set>
 
+#include "finitestateautomaton.h"
+
 // StateLinkHasher for HashMap
 std::size_t StateLinkHasher::operator()(const StateLink &s) const {
     using std::hash;
@@ -303,26 +305,31 @@ void Automaton::ValidateTestVector(int testIsDFAInput, int testIsFiniteInput, st
         }
     }
 
+    bool testIsFinite = testIsFiniteInput > 0;
     if(testIsFiniteInput) {
         bool isFiniteDFA = true;
-        bool testIsFinite = testIsFiniteInput > 0;
 
-        std::unordered_set<State, StateHasher> visited;
-        std::unordered_set<State, StateHasher> canReachEnd;
-        // note: only contain states belong to a non-empty weight cycle
-        std::unordered_set<State, StateHasher> belongsToCycle;
-        std::vector<State> dfsStack;
-        std::vector<char> weightStack;
+        FiniteStateAutomaton* fsatmp = dynamic_cast<FiniteStateAutomaton*>(this);
+        if(fsatmp == nullptr)
+            isFiniteDFA = false;
+        else {
+            std::unordered_set<State, StateHasher> visited;
+            std::unordered_set<State, StateHasher> canReachEnd;
+            // note: only contain states belong to a non-empty weight cycle
+            std::unordered_set<State, StateHasher> belongsToCycle;
+            std::vector<State> dfsStack;
+            std::vector<char> weightStack;
 
-        /* Check if the NFA has a finite language */
-        DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
+            /* Check if the NFA has a finite language */
+            DfsCheckFiniteLanguage(this->startState_, visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
 
-        // the language is infinite if:
-        // - exist a state can reach a final state
-        // - that state belongs to a non-empty weights cycle
-        for(auto&& state: listStates_) {
-            if(canReachEnd.count(state) && belongsToCycle.count(state)) {
-                isFiniteDFA = false;
+            // the language is infinite if:
+            // - exist a state can reach a final state
+            // - that state belongs to a non-empty weights cycle
+            for(auto&& state: listStates_) {
+                if(canReachEnd.count(state) && belongsToCycle.count(state)) {
+                    isFiniteDFA = false;
+                }
             }
         }
 
@@ -383,85 +390,6 @@ bool Automaton::ListAllWords(std::vector<std::string>& language)
     language.resize(std::distance(language.begin(), uniqueId));
 
     return true;
-}
-
-std::string Automaton::ToGraph()
-{
-    // start string
-    std::string content = "digraph Automaton {\n"
-                          "rankdir=LR;\n"
-                          "\"\" [shape=none]\n";
-
-    // end state
-    content += "node [shape = doublecircle]; ";
-    for(auto&& s : listEndStates_) {
-        content += s.getName() + " ";
-    }
-    content += ";\n";
-
-
-    // Draw remaining nodes. Draw edges
-    content += "node [shape = circle];\n";
-    content += std::string("\"\" -> ") + "\"" + startState_.getName() + "\"\n";
-
-    for(auto&& iter_f: transitions_) {
-        for(auto&& iter_s: iter_f.second) {
-            std::string formattedSymbol = std::string(1, iter_s.first);
-            if(formattedSymbol == "_")
-                formattedSymbol = "\u03B5";
-            content += "\"" + iter_f.first.getName() + "\"";
-            content += " -> ";
-            content += "\"" + iter_s.second.getName() + "\"";
-            content += std::string("[label = \"") + formattedSymbol + "\"];\n";
-        }
-    }
-
-    content += "}";
-
-    return content;
-}
-
-std::string Automaton::ToFileContent(std::string comment)
-{
-    std::string content;
-
-    if(comment != "") {
-        content += "#" + comment + "\n\n";
-    }
-
-    content += "alphabet: " + this->alphabet_ + "\n";
-
-    /* add list states. First state is alway the start state.*/
-    content += "states: ";
-
-    content += startState_.getName() + ",";
-
-    for(auto&& state: listStates_)
-        if(state.getName() != startState_.getName())
-            content += state.getName() + ",";
-
-    content.pop_back();
-    content += "\n";
-
-    /* final states */
-    content += "final: " + this->oneEndState_.getName() + "\n";
-
-    /* transitions */
-    content += "transitions:\n";
-
-    for(auto&& itStart: transitions_) {
-        auto start = itStart.first;
-
-        for(auto&& itLink: itStart.second) {
-            content += start.getName() + "," +
-                       itLink.first + " --> " +
-                       itLink.second.getName() + "\n";
-        }
-    }
-
-    content += "end.";
-
-    return content;
 }
 
 void Automaton::addState(State state)

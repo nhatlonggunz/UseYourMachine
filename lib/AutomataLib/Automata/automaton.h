@@ -103,9 +103,6 @@ public:
     // @return true if the language is finite, false otherwise
     bool ListAllWords(std::vector<std::string>& language);
 
-    std::string ToGraph();
-    std::string ToFileContent(std::string comment);
-
     virtual std::string toGraph() { return ""; };
     virtual std::string toFileContent(std::string comment) {return"";};
 

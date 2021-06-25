@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <sstream>
 #include <QDebug>
+#include <QPixmap>
 
 #include "Automata/nfatodfaconverter.h"
 
@@ -48,30 +49,30 @@ void app::on_actionOpen_triggered()
         // Parse input
         fi.seekg(0);
         parser.ReadFromStream(fi);
-        avtomat_ = parser.getAutomaton();
+        Automaton* avtomat = parser.getNewAvtomat();
 
         // Validate test vector
         auto isDFA = parser.getTestIsDFA();
         auto isFinite = parser.getTestIsFinite();
         auto testWords = parser.getTestWords();
 
-        avtomat_.ValidateTestVector(isDFA, isFinite, testWords);
+        avtomat->ValidateTestVector(isDFA, isFinite, testWords);
 
         // Write parsed content to file
         std::ofstream fo("ggout.txt");
-        fo << avtomat_;
+        fo << *avtomat;
 
         // Write to UI
         std::ostringstream os;
-        os << avtomat_;
+        os << *avtomat;
         std::string text = os.str();
 
         ui->textboxOutputFile->setText(QString::fromStdString(text));
         fi.close();
         fo.close();
 
-        LoadGraph(this->avtomat_, "automaton", ui->lblGraph);
-        EnumerateLanguage(this->avtomat_);
+        LoadGraph(avtomat, "automaton", ui->lblGraph);
+        EnumerateLanguage(*avtomat);
 
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
@@ -90,91 +91,32 @@ void app::on_btnReadInputFile_clicked()
         std::istringstream ss(input);
 
         parser.ReadFromStream(ss);
-        Automaton avtomat = parser.getAutomaton();
-        this->avtomat_ = avtomat;
+        Automaton* avtomat = parser.getNewAvtomat();
+
+        // Validate test vector
+        auto isDFA = parser.getTestIsDFA();
+        auto isFinite = parser.getTestIsFinite();
+        auto testWords = parser.getTestWords();
+
+        avtomat->ValidateTestVector(isDFA, isFinite, testWords);
 
         // Write parsed content to file
-        std::ofstream fo("ggout.txt");
-        fo << avtomat;
+        std::ofstream fo("parsed_content.txt");
+        fo << *avtomat;
 
-        // Write to UI textbox
+        // Write parsed content to UI
         std::ostringstream os;
-        os << avtomat;
+        os << *avtomat;
         std::string text = os.str();
 
         ui->textboxOutputFile->setText(QString::fromStdString(text));
+        fo.close();
 
-        LoadGraph(this->avtomat_, "automaton", ui->lblGraph);
-        EnumerateLanguage(this->avtomat_);
+        LoadGraph(avtomat, "automaton", ui->lblGraph);
+        EnumerateLanguage(*avtomat);
 
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());
-    }
-}
-
-void app::on_btnGenerateGraph_clicked()
-{
-    std::string dotContent = avtomat_.ToGraph();
-
-    std::ofstream fo("automaton.dot");
-    fo << dotContent;
-    fo.close();
-
-//    std::string cmd = "dot -Tpng -oautomaton.png automaton.dot";
-//    system(cmd.c_str());
-    QProcess *dotProcess = new QProcess(this);
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    qDebug() << env.toStringList();
-    dotProcess->setProcessEnvironment(env);
-    dotProcess->start("dot", QStringList() << "-Tpng" << "-oautomaton.png" << "automaton.dot");
-//    dotProcess->start("C:\\Long\\Fontys\\ALE2\\Graphviz\\bin\\dot.exe", QStringList() << "-v");
-
-
-
-    QString filename = "automaton.png";
-    ui->lblGraph->setAlignment(Qt::AlignCenter);
-    QPixmap pix;
-
-    /** to check wether load ok */
-    if(pix.load(filename)) {
-        /** scale pixmap to fit in label'size and keep ratio of pixmap */
-//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
-        ui->lblGraph->setPixmap(pix);
-    }
-}
-
-void app::LoadGraph(Automaton avtomat, std::string fileName, QLabel* label)
-{
-    /* Output graphviz .dot file from automata */
-    std::string dotContent = avtomat.ToGraph();
-
-    std::ofstream fo(fileName + ".dot");
-    fo << dotContent;
-    fo.close();
-
-    /* Generate png from dot with GraphViz */
-    QProcess *dotProcess = new QProcess(this);
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    // qDebug() << env.toStringList();
-
-    dotProcess->setProcessEnvironment(env);
-    dotProcess->start("dot",
-                      QStringList() << "-Tpng"
-                                    << ("-o" + fileName + ".png").c_str()
-                                    << (fileName + ".dot").c_str());
-    dotProcess->waitForFinished();
-    dotProcess->close();
-
-    /* Display the graph */
-    QString pngFileName = (fileName + ".png").c_str();
-    label->setAlignment(Qt::AlignCenter);
-    QPixmap pix;
-
-    /** to check wether load ok */
-    if(pix.load(pngFileName)) {
-        /** scale pixmap to fit in label'size and keep ratio of pixmap */
-//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
-        label->setPixmap(pix);
     }
 }
 
@@ -208,8 +150,9 @@ void app::LoadGraph(Automaton* avtomat, std::string fileName, QLabel* label)
     /** to check wether load ok */
     if(pix.load(pngFileName)) {
         /** scale pixmap to fit in label'size and keep ratio of pixmap */
-//        pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
+        // pix = pix.scaled(ui->lblGraph->size(),Qt::KeepAspectRatio);
         label->setPixmap(pix);
+        label->setScaledContents(true);
     }
 }
 
@@ -220,7 +163,7 @@ void app::EnumerateLanguage(Automaton avtomat)
     bool isLanguageFinite = avtomat.ListAllWords(language);
     if(!isLanguageFinite)
     {
-        ui->textboxListLanguage->setText("The associated language is not finite");
+        ui->textboxListLanguage->setText("The associated language is not finite DFA");
         return;
     }
 
@@ -255,7 +198,7 @@ void app::on_btnReadRegex_clicked()
 
     /* Generate DFA */
     NFAToDFAConverter converter(fsa);
-    Automaton dfa = converter.getDFA();
+    FiniteStateAutomaton* dfa = new FiniteStateAutomaton(converter.getDFA());
     LoadGraph(dfa, "DFA", ui->lblGraphDFA);
 
     delete fsa;

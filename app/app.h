@@ -23,8 +23,6 @@ private slots:
 
     void on_btnReadInputFile_clicked();
 
-    void on_btnGenerateGraph_clicked();
-
     void on_btnReadRegex_clicked();
 
 private:

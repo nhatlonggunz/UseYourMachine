@@ -149,6 +149,50 @@ bool PushDownAutomaton::checkCycle(const State &currentState,
     return true;
 }
 
+std::string PushDownAutomaton::toGraph()
+{
+    // start string
+    std::string content = "digraph PushdownAutomaton {\n"
+                          "rankdir=LR;\n"
+                          "\"\" [shape=none]\n";
+
+    // end state
+    content += "node [shape = doublecircle]; ";
+    for(auto&& s : this->listEndStates()) {
+        content += s.getName() + " ";
+    }
+    content += ";\n";
+
+
+    // Draw remaining nodes. Draw edges
+    content += "node [shape = circle];\n";
+    content += std::string("\"\" -> ") + "\"" + this->startState().getName() + "\"\n";
+
+    for(auto&& iter_f: transitions_) {
+        for(auto&& iter_s: iter_f.second) {
+            std::string formattedSymbol = std::string(1, iter_s.symbol());
+            if(formattedSymbol == "_")
+                formattedSymbol = "\u03B5";
+            content += "\"" + iter_f.first.getName() + "\"";
+            content += " -> ";
+            content += "\"" + iter_s.toState().getName() + "\"";
+
+            std::string label = "" + formattedSymbol;
+            if(iter_s.popSymbol() != EMPTY_SYMBOL || iter_s.pushSymbol() != EMPTY_SYMBOL)
+            {
+                label += "[" + std::string(1,iter_s.popSymbol()) + ", " +
+                        std::string(1, iter_s.pushSymbol()) + "]";
+            }
+
+            content += std::string("[label = \"") + label + "\"];\n";
+        }
+    }
+
+    content += "}";
+
+    return content;
+}
+
 bool PushdownTransitionComparer(const PushdownStateLink &a, const PushdownStateLink &b)
 {
     /* The transition precedence is: prioritize non-empty symbol

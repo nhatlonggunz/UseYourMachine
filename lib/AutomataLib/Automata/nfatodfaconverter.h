@@ -14,7 +14,7 @@ public:
     NFAToDFAConverter(FiniteStateAutomaton* nfa);
 
 
-    Automaton getDFA();
+    FiniteStateAutomaton getDFA();
 
 private:
     FiniteStateAutomaton* nfa_;
@@ -26,8 +26,8 @@ private:
     std::vector<State> dfaStateToNFAStates(State dfaState);
     std::vector<State> findClosure(State nfaState);
 
-    void exploreState(State curState, Automaton& dfa, std::queue<State>& qu);
-    Automaton ConvertToDFA();
+    void exploreState(State curState, FiniteStateAutomaton& dfa, std::queue<State>& qu);
+    FiniteStateAutomaton ConvertToDFA();
 
 };
 

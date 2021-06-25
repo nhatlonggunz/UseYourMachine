@@ -45,6 +45,8 @@ private:
                     int wordIndex,
                     const std::string& stack,
                     const std::set<std::string>& visited);
+
+    std::string toGraph() override;
 };
 
 // sort the transitions following precedence rules

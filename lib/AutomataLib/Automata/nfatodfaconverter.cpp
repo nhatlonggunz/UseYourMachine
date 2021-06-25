@@ -37,14 +37,14 @@ std::vector<State> NFAToDFAConverter::findClosure(State nfaState)
     return statesInClosure;
 }
 
-Automaton NFAToDFAConverter::getDFA()
+FiniteStateAutomaton NFAToDFAConverter::getDFA()
 {
     /* Generate closures from all states */
     for(auto&& state: this->nfa_->listStates()) {
         closures_[state] = findClosure(state);
     }
 
-    Automaton dfa = ConvertToDFA();
+    FiniteStateAutomaton dfa = ConvertToDFA();
     return dfa;
 }
 
@@ -85,7 +85,7 @@ std::vector<State> NFAToDFAConverter::dfaStateToNFAStates(State dfaState)
     return listStates;
 }
 
-void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<State>& qu)
+void NFAToDFAConverter::exploreState(State curState, FiniteStateAutomaton& dfa, std::queue<State>& qu)
 {
     std::vector<State> reachableStates[26];
     std::vector<State> nfaStates = dfaStateToNFAStates(curState);
@@ -139,9 +139,9 @@ void NFAToDFAConverter::exploreState(State curState, Automaton& dfa, std::queue<
     }
 }
 
-Automaton NFAToDFAConverter::ConvertToDFA()
+FiniteStateAutomaton NFAToDFAConverter::ConvertToDFA()
 {
-    Automaton dfa(this->nfa_->alphabet());
+    FiniteStateAutomaton dfa(this->nfa_->alphabet());
 
     /* Add init state */
     State initDfaState = createDfaState(findClosure(this->nfa_->startState()));
