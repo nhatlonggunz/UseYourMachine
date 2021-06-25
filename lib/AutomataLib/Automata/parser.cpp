@@ -4,6 +4,7 @@
 #include <string>
 
 #include "state.h"
+#include "finitestateautomaton.h"
 
 Parser::Parser()
 {
@@ -103,7 +104,7 @@ void Parser::ReadFromStream(std::istream &in)
     }
     else{
         avtomat_ = Automaton(alphabet, listStates, listFinalStates, transitions);
-        newAvtomat_ = new Automaton(alphabet, listStates, listFinalStates, transitions);
+        newAvtomat_ = new FiniteStateAutomaton(alphabet, listStates, listFinalStates, transitions);
     }
 }
 

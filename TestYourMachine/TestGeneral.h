@@ -61,14 +61,16 @@ TEST_P(TestDFAFixture, TestDFA) {
 
     Parser parser;
     parser.ReadFromStream(fi);
-    Automaton avtomat = parser.getAutomaton();
+    Automaton *avtomat = parser.getNewAvtomat();
 
     // Validate test vector
     auto isDFA = parser.getTestIsDFA();
     auto isFinite = parser.getTestIsFinite();
     auto testWords = parser.getTestWords();
 
-    EXPECT_NO_THROW(avtomat.ValidateTestVector(isDFA, isFinite, testWords));
+    EXPECT_NO_THROW(avtomat->ValidateTestVector(isDFA, isFinite, testWords));
+
+    delete avtomat;
 }
 
 
@@ -91,14 +93,16 @@ TEST_P(TestNFAFixture, TestNFA) {
 
     Parser parser;
     parser.ReadFromStream(fi);
-    Automaton avtomat = parser.getAutomaton();
+    Automaton *avtomat = parser.getNewAvtomat();
 
     // Validate test vector
     auto isDFA = parser.getTestIsDFA();
     auto isFinite = parser.getTestIsFinite();
     auto testWords = parser.getTestWords();
 
-    EXPECT_NO_THROW(avtomat.ValidateTestVector(isDFA, isFinite, testWords));
+    EXPECT_NO_THROW(avtomat->ValidateTestVector(isDFA, isFinite, testWords));
+
+    delete avtomat;
 }
 
 /* test PDA */
@@ -129,6 +133,8 @@ TEST_P(TestPDAFixture, TestPDA) {
     auto testWords = parser.getTestWords();
 
     EXPECT_NO_THROW(pdtmp->ValidateTestWords(testWords));
+
+    delete avtomat;
 }
 
 

@@ -17,7 +17,7 @@ B  , b  --> B
 end.
 
 dfa:	n 
-finite	:	n 
+finite	:	y 
 	words: 
 bbbbbbbbbb,y 
 a,y 

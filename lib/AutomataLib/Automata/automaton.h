@@ -116,7 +116,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Automaton& avtomat);
 
 
-    /* Getter and setters */
+    /* Getters and setters */
     std::string alphabet() const;
     std::vector<State> listStates() const;
 

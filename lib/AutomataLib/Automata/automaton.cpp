@@ -103,7 +103,9 @@ bool Automaton::IsWordBelongTo_Util(const State& curState, std::string word, int
                                     std::set<std::pair<State,int>>& visited)
 {
     // end of word, end up at a final state.
-    if(wordIndex == (int)word.length() && curState.IsFinal())
+    if(wordIndex == (int)word.length() &&
+       std::find(listEndStates_.begin(), listEndStates_.end(), curState)
+            != listEndStates_.end())
         return true;
 
     for(auto&& edge: this->transitions_[curState]) {
