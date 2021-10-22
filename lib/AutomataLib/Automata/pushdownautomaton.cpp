@@ -159,7 +159,7 @@ std::string PushDownAutomaton::toGraph()
     // end state
     content += "node [shape = doublecircle]; ";
     for(auto&& s : this->listEndStates()) {
-        content += s.getName() + " ";
+        content += "\"" + s.getName() + "\" ";
     }
     content += ";\n";
 

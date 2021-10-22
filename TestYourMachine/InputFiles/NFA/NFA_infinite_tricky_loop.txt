@@ -1,0 +1,29 @@
+#regex
+
+alphabet: ab
+states: S,A,B,C,D,E,F,G,X,Y,Z
+final: G
+
+transitions:
+S,a --> A
+A,a --> B
+B,a --> C
+C,a --> D
+D,a --> E
+E,a --> F
+F,a --> G
+
+C,b --> X
+X,b --> Y
+Y,b --> Z
+Z,b --> X
+Z,a --> E
+end.
+
+dfa:n
+finite:n
+
+words:
+aaaaaaa,y
+aaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb,n
+end.

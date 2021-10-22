@@ -62,12 +62,6 @@ void app::on_actionOpen_triggered()
         std::ofstream fo("ggout.txt");
         fo << *avtomat;
 
-        // Write to UI
-        std::ostringstream os;
-        os << *avtomat;
-        std::string text = os.str();
-
-        ui->textboxOutputFile->setText(QString::fromStdString(text));
         fi.close();
         fo.close();
 
@@ -106,16 +100,12 @@ void app::on_btnReadInputFile_clicked()
         std::ofstream fo("parsed_content.txt");
         fo << *avtomat;
 
-        // Write parsed content to UI
-        std::ostringstream os;
-        os << *avtomat;
-        std::string text = os.str();
-
-        ui->textboxOutputFile->setText(QString::fromStdString(text));
         fo.close();
 
         LoadGraph(avtomat, "automaton", ui->lblGraph);
         EnumerateLanguage(avtomat);
+
+        delete avtomat;
 
     }  catch (const std::invalid_argument& ia) {
         QMessageBox::warning(this, "Error", ia.what());

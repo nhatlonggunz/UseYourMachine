@@ -55,13 +55,6 @@ private:
     // DFS to check if word belong to automaton
     void ValidateTransitionsInput();
 
-    void DfsCheckFiniteLanguage(State currentState,
-                                std::unordered_set<State, StateHasher>& visited,
-                                std::unordered_set<State, StateHasher>& canReachEnd,
-                                std::unordered_set<State, StateHasher>& belongsToCycle,
-                                std::vector<State>& dfsStack,
-                                std::vector<char>& weightStack);
-
     void DfsPopulateLanguage(State currentState,
                              std::unordered_set<State, StateHasher>& visited,
                              std::unordered_set<State, StateHasher>& belongsToCycle,
@@ -83,7 +76,9 @@ public:
 
 
     /* Automaton high level features: check dfa, to graph... */
-    bool IsDFA() const;
+    virtual bool IsDFA() const {
+        return false;
+    };
 
     // check if a word belongs to the Automaton
     virtual bool IsWordBelongTo(std::string word) {
@@ -92,9 +87,22 @@ public:
         throw std::invalid_argument("Not implemented");
     }
 
-    void ValidateTestVector(int testIsDFA,
-                            int testIsFinite,
-                            std::vector<std::pair<std::string, bool> > testWords);
+    virtual void ValidateTestVector(int testIsDFAInput, int testIsFiniteInput,
+                                    std::vector<std::pair<std::string, bool> > testWords)
+    {
+        for(auto&& testWord: testWords) {
+            bool belongsToAutomaton = this->IsWordBelongTo(testWord.first);
+
+            if(belongsToAutomaton != testWord.second) {
+                std::string error = testWord.first +
+                                    (belongsToAutomaton ? " belongs to" : " does not belong to") +
+                                    "  DFA. While test vector says it" +
+                                    (testWord.second ? " belongs to" : " does not belong to") +
+                                    " DFA.";
+                throw std::invalid_argument(error);
+            }
+        }
+    };
 
     // Check if the Language represented by this automaton is finite
     // if it is finte, generate all words belonging to the language

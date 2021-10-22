@@ -1,0 +1,27 @@
+#regex
+
+alphabet: ab
+states: A,B,C,D
+final: A, B, C, D
+
+transitions:
+A,a --> B
+A,b --> D
+B,a --> A
+B,b --> C
+C,a --> D
+C,b --> B
+D,a --> C
+D,b --> A
+end.
+
+dfa: y
+finite: n
+
+words:
+,y
+ab,y
+aba,y
+b,y
+aababbabababbabaabababababab,y
+end.

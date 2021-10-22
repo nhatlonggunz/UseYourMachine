@@ -13,14 +13,13 @@ public:
                          std::vector<State> listFinalStates_,
                          Transitions transitions);
 
-    bool IsDFA() const;
+    bool IsDFA() const override;
     bool IsWordBelongTo(std::string word) override;
 
-    void ValidateTestVector(bool testIsDFA,
-                            bool testIsFinite,
-                            std::vector<std::pair<std::string, bool> > testWords);
+    void ValidateTestVector(int testIsDFAInput, int testIsFiniteInput,
+                                    std::vector<std::pair<std::string, bool> > testWords) override;
 
-    bool ListAllWords(std::vector<std::string>& language);
+    bool ListAllWords(std::vector<std::string>& language) override;
 
     /* Automaton building */
     void addTransition(State startState, char symbol, State endState);

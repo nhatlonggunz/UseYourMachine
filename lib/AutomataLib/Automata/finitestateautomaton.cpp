@@ -51,63 +51,60 @@ bool FiniteStateAutomaton::IsWordBelongTo(std::string word)
     return IsWordBelongTo_Util(this->startState(), word, 0, visited);
 }
 
-void FiniteStateAutomaton::ValidateTestVector(bool testIsDFA, bool testIsFinite, std::vector<std::pair<std::string, bool> > testWords)
+void FiniteStateAutomaton::ValidateTestVector(int testIsDFAInput, int testIsFiniteInput, std::vector<std::pair<std::string, bool> > testWords)
 {
-    bool thisIsDFA = IsDFA();
+    if(testIsDFAInput) {
+        bool thisIsDFA = IsDFA();
+        bool testIsDFA = testIsDFAInput > 0;
 
-    if(thisIsDFA  != testIsDFA) {
-        std::string error = std::string("This automaton is") +
-                            (thisIsDFA ? "" : " not") +
-                            " DFA. While test vector is" +
-                            (testIsDFA ? "" : " not") +
-                            " DFA.";
-
-        throw std::invalid_argument(error);
-    }
-
-    bool isFiniteDFA = true;
-
-    std::unordered_set<State, StateHasher> visited;
-    std::unordered_set<State, StateHasher> canReachEnd;
-    // note: only contain states belong to a non-empty weight cycle
-    std::unordered_set<State, StateHasher> belongsToCycle;
-    std::vector<State> dfsStack;
-    std::vector<char> weightStack;
-
-    /* Check if the NFA has a finite language */
-    DfsCheckFiniteLanguage(this->startState(), visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
-
-    // the language is infinite if:
-    // - exist a state can reach a final state
-    // - that state belongs to a non-empty weights cycle
-    for(auto&& state: this->listStates()) {
-        if(canReachEnd.count(state) && belongsToCycle.count(state)) {
-            isFiniteDFA = false;
-        }
-    }
-
-    if(isFiniteDFA  != testIsFinite) {
-        std::string error = std::string("This automaton is") +
-                            (isFiniteDFA ? "" : " not") +
-                            " finite. While test vector is" +
-                            (testIsFinite ? "" : " not") +
-                            " finite.";
-
-        throw std::invalid_argument(error);
-    }
-
-    for(auto&& testWord: testWords) {
-        bool belongsToAutomaton = this->IsWordBelongTo(testWord.first);
-
-        if(belongsToAutomaton != testWord.second) {
-            std::string error = testWord.first +
-                                (belongsToAutomaton ? " belongs to" : " does not belong to") +
-                                "  DFA. While test vector says it" +
-                                (testWord.second ? " belongs to" : " does not belong to") +
+        if(thisIsDFA  != testIsDFA) {
+            std::string error = std::string("This automaton is") +
+                                (thisIsDFA ? "" : " not") +
+                                " DFA. While test vector is" +
+                                (testIsDFA ? "" : " not") +
                                 " DFA.";
+
             throw std::invalid_argument(error);
         }
     }
+
+    bool testIsFinite = testIsFiniteInput > 0;
+    if(testIsFiniteInput) {
+        bool isFiniteDFA = true;
+
+
+        std::unordered_set<State, StateHasher> visited;
+        std::unordered_set<State, StateHasher> canReachEnd;
+        // note: only contain states belong to a non-empty weight cycle
+        std::unordered_set<State, StateHasher> belongsToCycle;
+        std::vector<State> dfsStack;
+        std::vector<char> weightStack;
+
+        /* Check if the NFA has a finite language */
+        DfsCheckFiniteLanguage(this->startState(), visited, canReachEnd, belongsToCycle, dfsStack, weightStack);
+
+        // the language is infinite if:
+        // - exist a state can reach a final state
+        // - that state belongs to a non-empty weights cycle
+        for(auto&& state: this->listStates()) {
+            if(canReachEnd.count(state) && belongsToCycle.count(state)) {
+                isFiniteDFA = false;
+            }
+        }
+
+
+        if(isFiniteDFA  != testIsFinite) {
+            std::string error = std::string("This automaton is") +
+                                (isFiniteDFA ? "" : " not") +
+                                " finite. While test vector is" +
+                                (testIsFinite ? "" : " not") +
+                                " finite.";
+
+            throw std::invalid_argument(error);
+        }
+    }
+
+    Automaton::ValidateTestVector(testIsDFAInput, testIsFiniteInput, testWords);
 }
 
 bool FiniteStateAutomaton::ListAllWords(std::vector<std::string> &language)
@@ -196,7 +193,7 @@ std::string FiniteStateAutomaton::toGraph()
     // end state
     content += "node [shape = doublecircle]; ";
     for(auto&& s : this->listEndStates()) {
-        content += s.getName() + " ";
+        content += "\"" + s.getName() + "\" ";
     }
     content += ";\n";
 
